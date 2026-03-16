@@ -17,6 +17,18 @@
       "POST"
     ],
     "paramNames": [],
+    "path": "/api/modifypwd",
+    "regexp": "/^\\/api\\/modifypwd(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
     "path": "/api/createaccount",
     "regexp": "/^\\/api\\/createaccount(?:\\/(?=$))?$/",
     "stack": [
@@ -55,6 +67,30 @@
     "paramNames": [],
     "path": "/api/userlist",
     "regexp": "/^\\/api\\/userlist(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/api/getFsbAccountPwd",
+    "regexp": "/^\\/api\\/getFsbAccountPwd(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/api/updateFsbPwd",
+    "regexp": "/^\\/api\\/updateFsbPwd(?:\\/(?=$))?$/",
     "stack": [
       "wrappedController"
     ]
@@ -137,8 +173,32 @@
       "POST"
     ],
     "paramNames": [],
+    "path": "/api/report/updatetype",
+    "regexp": "/^\\/api\\/report\\/updatetype(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
     "path": "/api/report/addsql",
     "regexp": "/^\\/api\\/report\\/addsql(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/api/report/addsqlbatch",
+    "regexp": "/^\\/api\\/report\\/addsqlbatch(?:\\/(?=$))?$/",
     "stack": [
       "wrappedController"
     ]
@@ -319,6 +379,42 @@
     "paramNames": [],
     "path": "/api/report/deletefile",
     "regexp": "/^\\/api\\/report\\/deletefile(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/api/report/rename",
+    "regexp": "/^\\/api\\/report\\/rename(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/api/report/tasksort",
+    "regexp": "/^\\/api\\/report\\/tasksort(?:\\/(?=$))?$/",
+    "stack": [
+      "wrappedController"
+    ]
+  },
+  {
+    "name": null,
+    "methods": [
+      "POST"
+    ],
+    "paramNames": [],
+    "path": "/api/report/dailyreport",
+    "regexp": "/^\\/api\\/report\\/dailyreport(?:\\/(?=$))?$/",
     "stack": [
       "wrappedController"
     ]

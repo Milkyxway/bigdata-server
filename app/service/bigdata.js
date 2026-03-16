@@ -1,4 +1,7 @@
 const Service = require("egg").Service;
+const XLSX = require('xlsx');
+const path = require('path');
+
 
 class BigDataService extends Service {
 	/**
@@ -513,6 +516,35 @@ class BigDataService extends Service {
 				const sql = `select * from(select distinct reportName, count(reportId) total from report_list where LargeCategory = '一次性' group by reportName) a order by a.total desc `
 				const result = await this.app.mysql.query(sql)
 				resolve(result)
+			}catch(e) {
+				reject(e)
+			}
+		})
+	}
+
+	dailyReport(data) {
+		return new Promise(async(resolve, reject) => {
+			try {
+ 			const excelData = await this.getExcelList(data.taskId);
+			const fileName = excelData.reverse()[0].excelData
+		
+
+			// 1. 检查文件是否存在
+    		const fs = require('fs').promises;
+    		await fs.access(`${path.resolve()}/app/public/out/${fileName}`);
+
+			// 2. 读取 Excel 文件
+    		const workbook = XLSX.readFile(`${path.resolve()}/app/public/out/${fileName}`);
+			const jsonData = {};
+			workbook.SheetNames.forEach(sheetName => {
+  			const worksheet = workbook.Sheets[sheetName];
+  			jsonData[sheetName] = XLSX.utils.sheet_to_json(worksheet);
+			});
+
+			resolve({
+				jsonData,
+				fileName
+			})
 			}catch(e) {
 				reject(e)
 			}

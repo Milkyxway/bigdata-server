@@ -14,7 +14,8 @@
     "egg-scripts": "^2",
     "ftp": "^0.3.10",
     "mkdirp": "^3.0.1",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "egg-bin": "^5",
