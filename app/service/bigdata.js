@@ -142,6 +142,17 @@ class BigDataService extends Service {
 			}
 		})
 	}
+	getExcelListDate(date) {
+		return new Promise(async(resolve, reject) => {
+			try {
+				const sqlStr = `select * from excel_list where excelData like '${date}%' and reportId=2189`
+				const result = await this.app.mysql.query(sqlStr)
+				resolve(result[0].excelData)
+			}catch(e) {
+				reject(e)
+			}
+		})
+	}
 
 	setData(list) {
 		return new Promise((resolve, reject) => {
@@ -525,8 +536,10 @@ class BigDataService extends Service {
 	dailyReport(data) {
 		return new Promise(async(resolve, reject) => {
 			try {
+			
  			const excelData = await this.getExcelList(data.taskId);
-			const fileName = excelData.reverse()[0].excelData
+			
+			const fileName = data.pickdate? await this.getExcelListDate(data.pickdate) : excelData.reverse()[0].excelData
 		
 
 			// 1. 检查文件是否存在
