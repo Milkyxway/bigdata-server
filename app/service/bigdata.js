@@ -563,6 +563,64 @@ class BigDataService extends Service {
 			}
 		})
 	}
+
+	pushLatestExcel() {
+		return new Promise(async(resolve, reject) => {
+			try {
+				const taskId = 2189;
+				const today = require('dayjs')().format('YYYY-MM-DD');
+				const fs = require('fs').promises;
+				const flagFile = `${path.resolve()}/app/public/out/.push_done_${today}`;
+
+				try {
+					await fs.access(flagFile);
+					this.ctx.logger.info(`[pushLatestExcel] 今天(${today})已推送过，跳过`);
+					resolve({ success: false, message: '今天已推送过，跳过' });
+					return;
+				} catch(e) {}
+
+				const excelData = await this.getExcelList(taskId);
+				if (!excelData || excelData.length === 0) {
+					this.ctx.logger.info('[pushLatestExcel] 任务2189没有找到Excel文件');
+					resolve({ success: false, message: '没有找到Excel文件' });
+					return;
+				}
+
+				const fileName = excelData.reverse()[0].excelData;
+				if (!fileName || !fileName.startsWith(today)) {
+					this.ctx.logger.info(`[pushLatestExcel] 今天(${today})暂无新文件，最新: ${fileName}，跳过`);
+					resolve({ success: false, message: '今天暂无新文件产出，跳过推送' });
+					return;
+				}
+
+				const localPath = `${path.resolve()}/app/public/out/${fileName}`;
+				await fs.access(localPath);
+
+				const Client = require('ssh2-sftp-client');
+				const sftp = new Client();
+				const sftpConfig = this.config.pushSftp;
+
+				await sftp.connect({
+					host: sftpConfig.host,
+					port: sftpConfig.port || 22,
+					username: sftpConfig.username,
+					password: sftpConfig.password,
+				});
+
+				const remotePath = `${sftpConfig.targetDir}/${fileName}`;
+				await sftp.put(localPath, remotePath);
+				sftp.end();
+
+				await fs.writeFile(flagFile, fileName);
+
+				this.ctx.logger.info(`[pushLatestExcel] SFTP推送成功: ${fileName} -> ${remotePath}`);
+				resolve({ success: true, fileName, remotePath });
+			} catch(e) {
+				this.ctx.logger.error(`[pushLatestExcel] SFTP推送失败: ${e.message}`);
+				reject(e);
+			}
+		});
+	}
 }
 
 module.exports = BigDataService;

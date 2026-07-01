@@ -88,6 +88,14 @@ module.exports = (appInfo) => {
 		},
 	};
 
+config.pushSftp = {
+    host: '172.16.176.76',                          // 新服务器IP
+    port: 22,                                        // SSH端口
+    username: 'root',                                // 新服务器用户名（你登录用的）
+    password: 'Yyzczx78&*',                    // 你填真实密码
+    targetDir: '/opt/data-dashboard/backend/uploads', // 目标就是 uploads/ 目录
+};
+
 	return {
 		...config,
 		...userConfig,
