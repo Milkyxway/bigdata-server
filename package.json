@@ -29,7 +29,7 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-task-backend",
+    "start": "egg-scripts start --title=egg-server-task-backend",
     "stop": "egg-scripts stop --title=egg-server-task-backend",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",

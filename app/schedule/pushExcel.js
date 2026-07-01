@@ -7,6 +7,7 @@ class PushExcel extends Subscription {
 		return {
 			cron: '0,30 15-17 * * *',
 			type: "worker",
+			immediate: true,
 		};
 	}
 

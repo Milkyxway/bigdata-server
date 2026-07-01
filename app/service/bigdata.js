@@ -147,7 +147,7 @@ class BigDataService extends Service {
 			try {
 				const sqlStr = `select * from excel_list where excelData like '${date}%' and reportId=2189`
 				const result = await this.app.mysql.query(sqlStr)
-				resolve(result[0].excelData)
+				resolve(result[0] ? result[0].excelData : null)
 			}catch(e) {
 				reject(e)
 			}
@@ -568,9 +568,9 @@ class BigDataService extends Service {
 		return new Promise(async(resolve, reject) => {
 			try {
 				const taskId = 2189;
-				const today = require('dayjs')().format('YYYY-MM-DD');
+				const today = require('dayjs')().format('YYYYMMDD');
 				const fs = require('fs').promises;
-				const flagFile = `${path.resolve()}/app/public/out/.push_done_${today}`;
+				const flagFile = path.join(path.resolve(), 'app/public/out', `.push_done_${today}`);
 
 				try {
 					await fs.access(flagFile);
@@ -579,21 +579,14 @@ class BigDataService extends Service {
 					return;
 				} catch(e) {}
 
-				const excelData = await this.getExcelList(taskId);
-				if (!excelData || excelData.length === 0) {
-					this.ctx.logger.info('[pushLatestExcel] 任务2189没有找到Excel文件');
-					resolve({ success: false, message: '没有找到Excel文件' });
-					return;
-				}
-
-				const fileName = excelData.reverse()[0].excelData;
-				if (!fileName || !fileName.startsWith(today)) {
-					this.ctx.logger.info(`[pushLatestExcel] 今天(${today})暂无新文件，最新: ${fileName}，跳过`);
+				const fileName = await this.getExcelListDate(today);
+				if (!fileName) {
+					this.ctx.logger.info(`[pushLatestExcel] 今天(${today})暂无新文件产出，跳过推送`);
 					resolve({ success: false, message: '今天暂无新文件产出，跳过推送' });
 					return;
 				}
 
-				const localPath = `${path.resolve()}/app/public/out/${fileName}`;
+				const localPath = path.join(path.resolve(), 'app/public/out', fileName);
 				await fs.access(localPath);
 
 				const Client = require('ssh2-sftp-client');
@@ -609,7 +602,6 @@ class BigDataService extends Service {
 
 				const remotePath = `${sftpConfig.targetDir}/${fileName}`;
 				await sftp.put(localPath, remotePath);
-				sftp.end();
 
 				await fs.writeFile(flagFile, fileName);
 
@@ -618,6 +610,8 @@ class BigDataService extends Service {
 			} catch(e) {
 				this.ctx.logger.error(`[pushLatestExcel] SFTP推送失败: ${e.message}`);
 				reject(e);
+			} finally {
+				try { sftp.end(); } catch(e) {}
 			}
 		});
 	}
