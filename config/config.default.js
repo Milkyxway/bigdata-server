@@ -96,6 +96,13 @@ config.pushSftp = {
     targetDir: '/opt/data-dashboard/uploads', // 目标就是 uploads/ 目录
 };
 
+config.deepseek = {
+    apiKey: 'sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG',
+    model: 'deepseek-v4-pro',
+    baseURL: 'http://modelrouter.js96296.com/v1',
+    timeout: 120000,
+};
+
 	return {
 		...config,
 		...userConfig,

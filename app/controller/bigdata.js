@@ -220,6 +220,50 @@ class BigDataController extends Controller {
 			return ctx.sendError(e);
 		}
 	}
+
+	async generateSql() {
+		const { ctx, service } = this;
+		const { requirement, prompt } = ctx.request.body;
+		const query = requirement || prompt;
+		if (!query) {
+			return ctx.sendError('请输入取数需求描述');
+		}
+
+		let attachmentText = '';
+		const files = ctx.request.files;
+		if (files && files.length > 0) {
+			const file = files[0];
+			const XLSX = require('xlsx');
+			const workbook = XLSX.readFile(file.filepath);
+			const sheetName = workbook.SheetNames[0];
+			const sheet = workbook.Sheets[sheetName];
+			const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+			if (data.length > 0) {
+				const headers = data[0];
+				const rows = data.slice(1);
+				attachmentText = '\n\n附件Excel内容如下：\n';
+				attachmentText += '| ' + headers.join(' | ') + ' |\n';
+				attachmentText += '| ' + headers.map(() => '---').join(' | ') + ' |\n';
+				for (const row of rows) {
+					attachmentText += '| ' + row.map(c => c != null ? String(c) : '').join(' | ') + ' |\n';
+				}
+			}
+		}
+
+		ctx.set('Content-Type', 'text/event-stream');
+		ctx.set('Cache-Control', 'no-cache');
+		ctx.set('Connection', 'keep-alive');
+		ctx.status = 200;
+
+		try {
+			for await (const event of service.aiSql.generateStream(query, attachmentText)) {
+				ctx.res.write(`data: ${JSON.stringify(event)}\n\n`);
+			}
+		} catch (e) {
+			ctx.res.write(`data: ${JSON.stringify({ type: 'error', message: e.message || 'AI服务异常' })}\n\n`);
+		}
+		ctx.res.end();
+	}
 }
 
 module.exports = BigDataController;

@@ -1,7 +1,7 @@
 const Service = require("egg").Service;
 const XLSX = require('xlsx');
 const path = require('path');
-
+const fs = require('fs');
 
 class BigDataService extends Service {
 	/**
@@ -615,6 +615,7 @@ class BigDataService extends Service {
 			}
 		});
 	}
+
 }
 
 module.exports = BigDataService;

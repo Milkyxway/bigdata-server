@@ -64,4 +64,5 @@ module.exports = (app) => {
 
 	router.post("/api/report/tasksort", controller.bigdata.taskSort);
 	router.post("/api/report/dailyreport", controller.bigdata.dailyReport);
+	router.post("/api/report/generateSql", controller.bigdata.generateSql);
 };
