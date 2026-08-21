@@ -70,6 +70,8 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | files2.um_res                    | CUST_ID           | rep2.rep_fact_cust_info_yyyymmdd   | CUST_ID           | 1:1  | 终端物理信息对应客户   |
 | rep.fin2_received_fee_dev_yyyymm | 客户证号          | rep2.rep_fact_cust_info_yyyymmdd   | CUST_CODE         | 1:1  | 发票对应客户           |
 | rep.fin2_received_fee_dev_yyyymm | DEV_ID            | params1.sec_developer              | DEV_ID            | 1:1  | 发票对应发展人         |
+| dwd.dwd_all_movie_detail_yyyymm   | CLIENT_ID         | files2.um_subscriber               | BILL_ID           | N:1  | 点播记录对应终端       |
+| cp2.cm_customer                   | CUST_ID           | files2.um_subscriber               | CUST_ID           | 1:1  | 客户主表对应终端       |
 
 ## 表结构
 
@@ -95,6 +97,7 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | VALID_DATE        | VARCHAR2(20) | 产品生效时间 |
 | EXPIRE_DATE       | VARCHAR2(20) | 产品过期时间 |
 | SUBSCRIBER_INS_ID | VARCHAR2(20) | 终端ID       |
+| PROD_SERVICE_ID   | VARCHAR2(20) | 业务类型 1002=电视, 1003=互动, 1004=宽带, 1005=付费节目, 1006=互动点播, 1008=增值业务 |
 
 ### rep.dwa_wage_pay_detail_dev_yyyymm（用户缴费带发展人表）
 | 字段名          | 类型               | 说明                     |
@@ -130,6 +133,7 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | CUST_ID           | NUMBER(18)   | 主键                                   |
 | SUBSCRIBER_INS_ID | VARCHAR2(20) | 终端ID                                 |
 | CREATE_DATE       | VARCHAR2(20) | 创建时间                               |
+| BILL_ID           | VARCHAR2(20) | 机顶盒号                               |
 | subscriber_type   | VARCHAR2(20) | 订阅类型 1=电视, 3=宽带                |
 | expire_date       | VARCHAR2(20) | 终端过期时间                           |
 | login_name        | VARCHAR2(20) | 宽带账号                               |
@@ -227,6 +231,15 @@ FROM (
 | EXPIRE_DATE | DATE         | 失效日期                               |
 | PAY_TYPE    | NUMBER(2)    | 支付方式 1=现金 2=支付宝 3=银行卡托收  |
 | PAY_MODE    | NUMBER(2)    | 1=预付费, 2=后付费                     |
+
+### cp2.cm_customer（客户主表）cust_code 转 cust_id 用
+| 字段名      | 类型         | 说明       |
+| :---------- | :----------- | :--------- |
+| CUST_ID     | NUMBER(16)   | 客户ID     |
+| CUST_CODE   | VARCHAR2(20) | 客户证号   |
+| CUST_STATUS | VARCHAR2(20) | 客户状态   |
+| create_date | DATE         | 开户时间   |
+| corp_org_id   | VARCHAR2(20) | 市ID 3303=无锡, 3328=江阴, 3330=宜兴                                  |
 
 ### rep.rep_fact_lan_cust_new_yyyymmdd（有价宽带终端表）
 | 字段名                  | 类型       | 说明                               |
@@ -431,3 +444,8 @@ FROM (
 | ORD_DEV_ID           | VARCHAR2(100) | 订购发展人ID             |
 | ORD_CANCEL_DEV_ID    | VARCHAR2(100) | 退订发展人ID             |
 | ETL_DATE             | DATE          | ETL日期                  |
+
+### dwd.dwd_all_movie_detail_yyyymm（点播明细表，月分区）
+| 字段名       | 类型         | 说明                                    |
+| :----------- | :----------- | :-------------------------------------- |
+| CLIENTID    | VARCHAR2(20) | 终端标识，关联 um_subscriber.BILL_ID    |

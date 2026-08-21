@@ -65,4 +65,12 @@ module.exports = (app) => {
 	router.post("/api/report/tasksort", controller.bigdata.taskSort);
 	router.post("/api/report/dailyreport", controller.bigdata.dailyReport);
 	router.post("/api/report/generateSql", controller.bigdata.generateSql);
+	router.post("/api/report/mergeDaily", controller.bigdata.mergeDaily);
+
+	// ==================== Skill 配置管理 ====================
+	// Skill 配置管理（精简版：查看、AI添加、删除）
+	router.get("/api/skill/config", controller.skillConfig.getConfig);
+	router.post("/api/skill/ai-append", controller.skillConfig.aiAppend);
+	router.post("/api/skill/delete", controller.skillConfig.deleteItem);
+	router.get("/api/skill/recent-prompts", controller.skillConfig.recentPrompts);
 };

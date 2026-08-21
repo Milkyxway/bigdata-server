@@ -1,332 +1,338 @@
 {
-  "keys": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-  "middleware": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
+  "keys": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+  "middleware": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
   "mysql": {
     "client": {
-      "host": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-      "port": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-      "user": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-      "password": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-      "database": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js"
+      "host": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+      "port": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+      "user": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+      "password": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+      "database": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js"
     },
     "default": {
-      "database": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-mysql@4.0.0@egg-mysql/config/config.default.js",
-      "connectionLimit": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-mysql@4.0.0@egg-mysql/config/config.default.js"
+      "database": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-mysql\\config\\config.default.js",
+      "connectionLimit": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-mysql\\config\\config.default.js"
     },
-    "app": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-mysql@4.0.0@egg-mysql/config/config.default.js",
-    "agent": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-mysql@4.0.0@egg-mysql/config/config.default.js"
+    "app": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-mysql\\config\\config.default.js",
+    "agent": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-mysql\\config\\config.default.js"
   },
   "security": {
     "csrf": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-      "type": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "ignoreJSON": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "useSession": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "cookieName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "sessionName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "headerName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "bodyName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "queryName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "supportedRequests": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "refererWhiteList": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+      "type": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "ignoreJSON": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "useSession": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "cookieName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "sessionName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "headerName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "bodyName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "queryName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "supportedRequests": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "refererWhiteList": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
-    "domainWhiteList": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-    "protocolWhiteList": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-    "defaultMiddleware": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
+    "domainWhiteList": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+    "protocolWhiteList": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+    "defaultMiddleware": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
     "xframe": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "value": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "value": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "hsts": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.local.js",
-      "maxAge": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "includeSubdomains": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "maxAge": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "includeSubdomains": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "dta": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "methodnoallow": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "noopen": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "nosniff": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "referrerPolicy": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "value": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "value": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "xssProtection": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "value": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "value": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "csp": {
-      "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "policy": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "policy": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     },
     "ssrf": {
-      "ipBlackList": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "ipExceptionList": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js",
-      "checkAddress": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+      "ipBlackList": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "ipExceptionList": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js",
+      "checkAddress": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
     }
   },
   "cors": {
-    "origin": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-    "allowMethods": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js"
+    "origin": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "allowMethods": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js"
   },
   "multipart": {
-    "mode": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-    "whitelist": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-    "autoFields": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "defaultCharset": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "defaultParamCharset": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "fieldNameSize": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "fieldSize": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "fields": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "fileSize": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "files": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "fileExtensions": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "allowArrayField": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-    "tmpdir": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
+    "mode": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "whitelist": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "fileSize": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "autoFields": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "defaultCharset": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "defaultParamCharset": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "fieldNameSize": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "fieldSize": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "fields": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "files": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "fileExtensions": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "allowArrayField": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+    "tmpdir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
     "cleanSchedule": {
-      "cron": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js",
-      "disable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart/config/config.default.js"
+      "cron": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js",
+      "disable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart\\config\\config.default.js"
     }
   },
   "cluster": {
     "listen": {
-      "port": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "hostname": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "port": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "hostname": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     }
   },
-  "uploadDir": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
-  "uploadReport": "/Users/xujiashuang/Desktop/bigdata-server/config/config.default.js",
+  "pushSftp": {
+    "host": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "port": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "username": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "password": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "targetDir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js"
+  },
+  "deepseek": {
+    "apiKey": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "model": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "baseURL": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+    "timeout": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js"
+  },
+  "uploadDir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
+  "uploadReport": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\config.default.js",
   "session": {
-    "maxAge": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-session@3.3.0@egg-session/config/config.default.js",
-    "key": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-session@3.3.0@egg-session/config/config.default.js",
-    "httpOnly": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-session@3.3.0@egg-session/config/config.default.js",
-    "encrypt": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-session@3.3.0@egg-session/config/config.default.js",
-    "logValue": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-session@3.3.0@egg-session/config/config.default.js"
+    "maxAge": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-session\\config\\config.default.js",
+    "key": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-session\\config\\config.default.js",
+    "httpOnly": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-session\\config\\config.default.js",
+    "encrypt": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-session\\config\\config.default.js",
+    "logValue": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-session\\config\\config.default.js"
   },
   "helper": {
-    "shtml": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security/config/config.default.js"
+    "shtml": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security\\config\\config.default.js"
   },
   "jsonp": {
-    "limit": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-jsonp@2.0.0@egg-jsonp/config/config.default.js",
-    "callback": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-jsonp@2.0.0@egg-jsonp/config/config.default.js",
-    "csrf": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-jsonp@2.0.0@egg-jsonp/config/config.default.js"
+    "limit": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-jsonp\\config\\config.default.js",
+    "callback": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-jsonp\\config\\config.default.js",
+    "csrf": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-jsonp\\config\\config.default.js"
   },
   "onerror": {
-    "errorPageUrl": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-onerror@2.2.0@egg-onerror/config/config.default.js",
-    "appErrorFilter": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-onerror@2.2.0@egg-onerror/config/config.default.js",
-    "templatePath": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-onerror@2.2.0@egg-onerror/config/config.default.js"
+    "errorPageUrl": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-onerror\\config\\config.default.js",
+    "appErrorFilter": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-onerror\\config\\config.default.js",
+    "templatePath": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-onerror\\config\\config.default.js"
   },
   "i18n": {
-    "defaultLocale": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-i18n@2.1.1@egg-i18n/config/config.default.js",
-    "dirs": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-i18n@2.1.1@egg-i18n/config/config.default.js",
-    "queryField": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-i18n@2.1.1@egg-i18n/config/config.default.js",
-    "cookieField": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-i18n@2.1.1@egg-i18n/config/config.default.js",
-    "cookieDomain": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-i18n@2.1.1@egg-i18n/config/config.default.js",
-    "cookieMaxAge": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-i18n@2.1.1@egg-i18n/config/config.default.js"
+    "defaultLocale": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-i18n\\config\\config.default.js",
+    "dirs": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-i18n\\config\\config.default.js",
+    "queryField": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-i18n\\config\\config.default.js",
+    "cookieField": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-i18n\\config\\config.default.js",
+    "cookieDomain": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-i18n\\config\\config.default.js",
+    "cookieMaxAge": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-i18n\\config\\config.default.js"
   },
   "watcher": {
-    "type": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-watcher@3.1.1@egg-watcher/config/config.local.js",
+    "type": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-watcher\\config\\config.default.js",
     "eventSources": {
-      "default": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-watcher@3.1.1@egg-watcher/config/config.default.js",
-      "development": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-watcher@3.1.1@egg-watcher/config/config.default.js"
+      "default": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-watcher\\config\\config.default.js",
+      "development": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-watcher\\config\\config.default.js"
     }
   },
   "customLogger": {
     "scheduleLogger": {
-      "consoleLevel": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-schedule@4.0.0@egg-schedule/config/config.default.js",
-      "file": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-schedule@4.0.0@egg-schedule/config/config.default.js"
+      "consoleLevel": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-schedule\\config\\config.default.js",
+      "file": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-schedule\\config\\config.default.js"
     }
   },
   "schedule": {
-    "directory": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-schedule@4.0.0@egg-schedule/config/config.default.js"
-  },
-  "development": {
-    "watchDirs": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-development@2.7.0@egg-development/config/config.default.js",
-    "ignoreDirs": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-development@2.7.0@egg-development/config/config.default.js",
-    "fastReady": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-development@2.7.0@egg-development/config/config.default.js",
-    "reloadOnDebug": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-development@2.7.0@egg-development/config/config.default.js",
-    "overrideDefault": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-development@2.7.0@egg-development/config/config.default.js",
-    "overrideIgnore": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-development@2.7.0@egg-development/config/config.default.js"
+    "directory": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-schedule\\config\\config.default.js"
   },
   "logrotator": {
-    "filesRotateByHour": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator/config/config.default.js",
-    "hourDelimiter": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator/config/config.default.js",
-    "filesRotateBySize": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator/config/config.default.js",
-    "maxFileSize": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator/config/config.default.js",
-    "maxFiles": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator/config/config.default.js",
-    "rotateDuration": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator/config/config.default.js",
-    "maxDays": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator/config/config.default.js"
+    "filesRotateByHour": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator\\config\\config.default.js",
+    "hourDelimiter": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator\\config\\config.default.js",
+    "filesRotateBySize": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator\\config\\config.default.js",
+    "maxFileSize": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator\\config\\config.default.js",
+    "maxFiles": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator\\config\\config.default.js",
+    "rotateDuration": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator\\config\\config.default.js",
+    "maxDays": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator\\config\\config.default.js"
   },
   "static": {
-    "prefix": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-static@2.3.1@egg-static/config/config.default.js",
-    "dir": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-static@2.3.1@egg-static/config/config.default.js",
-    "dynamic": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-static@2.3.1@egg-static/config/config.default.js",
-    "preload": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-static@2.3.1@egg-static/config/config.default.js",
-    "buffer": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-static@2.3.1@egg-static/config/config.default.js",
-    "maxFiles": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-static@2.3.1@egg-static/config/config.default.js"
+    "prefix": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static\\config\\config.default.js",
+    "dir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static\\config\\config.default.js",
+    "dynamic": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static\\config\\config.default.js",
+    "preload": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static\\config\\config.default.js",
+    "buffer": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static\\config\\config.prod.js",
+    "maxFiles": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static\\config\\config.default.js",
+    "maxAge": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static\\config\\config.prod.js"
   },
   "view": {
-    "root": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-view@2.1.4@egg-view/config/config.default.js",
-    "cache": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-view@2.1.4@egg-view/config/config.local.js",
-    "defaultExtension": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-view@2.1.4@egg-view/config/config.default.js",
-    "defaultViewEngine": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-view@2.1.4@egg-view/config/config.default.js",
-    "mapping": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-view@2.1.4@egg-view/config/config.default.js"
+    "root": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-view\\config\\config.default.js",
+    "cache": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-view\\config\\config.default.js",
+    "defaultExtension": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-view\\config\\config.default.js",
+    "defaultViewEngine": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-view\\config\\config.default.js",
+    "mapping": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-view\\config\\config.default.js"
   },
-  "env": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "name": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "cookies": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "proxy": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "maxIpsCount": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "maxProxyCount": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "protocolHeaders": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "ipHeaders": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "hostHeaders": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
+  "env": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "name": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "cookies": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "proxy": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "maxIpsCount": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "maxProxyCount": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "protocolHeaders": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "ipHeaders": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "hostHeaders": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
   "pkg": {
-    "name": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "version": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "description": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "private": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
+    "name": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "version": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "description": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "private": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
     "egg": {
-      "declarations": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "declarations": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "dependencies": {
-      "dayjs": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "egg": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "egg-cors": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "egg-mysql": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "egg-scripts": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "ftp": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "mkdirp": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "moment": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "dayjs": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "egg": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "egg-cors": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "egg-mysql": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "egg-scripts": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "ftp": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "mkdirp": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "moment": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "ssh2-sftp-client": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "xlsx": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "devDependencies": {
-      "egg-bin": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "egg-ci": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "egg-mock": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "eslint": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "eslint-config-egg": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "egg-bin": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "egg-ci": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "egg-mock": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "eslint": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "eslint-config-egg": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "engines": {
-      "node": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "node": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "scripts": {
-      "start": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "stop": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "dev": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "debug": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "test": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "test-local": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "cov": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "lint": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "ci": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "start": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "stop": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "dev": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "debug": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "test": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "test-local": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "cov": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "lint": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "ci": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "ci": {
-      "version": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "type": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "version": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "type": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "repository": {
-      "type": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "url": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "type": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "url": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
-    "author": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "license": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "author": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "license": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
-  "baseDir": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "HOME": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "rundir": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
+  "baseDir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "HOME": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "rundir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
   "dump": {
-    "ignore": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
+    "ignore": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
     "timing": {
-      "slowBootActionMinDuration": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "slowBootActionMinDuration": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     }
   },
   "confusedConfigurations": {
-    "bodyparser": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "notFound": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "sitefile": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "middlewares": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "httpClient": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "bodyparser": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "notFound": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "sitefile": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "middlewares": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "httpClient": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
   "notfound": {
-    "pageUrl": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "pageUrl": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
   "siteFile": {
-    "/favicon.ico": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "cacheControl": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "/favicon.ico": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "cacheControl": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
   "bodyParser": {
-    "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "encoding": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "formLimit": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "jsonLimit": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "textLimit": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "strict": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
+    "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "encoding": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "formLimit": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "jsonLimit": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "textLimit": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "strict": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
     "queryString": {
-      "arrayLimit": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "depth": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "parameterLimit": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "arrayLimit": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "depth": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "parameterLimit": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
-    "onerror": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "onerror": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
   "logger": {
-    "dir": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "encoding": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "env": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "level": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "consoleLevel": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "disableConsoleAfterReady": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "outputJSON": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "buffer": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "appLogName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "coreLogName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "agentLogName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "errorLogName": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "coreLogger": {
-      "consoleLevel": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.local.js"
-    },
-    "allowDebugAtProd": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "enablePerformanceTimer": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "enableFastContextLogger": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "dir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "encoding": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "env": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "level": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "consoleLevel": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "disableConsoleAfterReady": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "outputJSON": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "buffer": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "appLogName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "coreLogName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "agentLogName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "errorLogName": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "coreLogger": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "allowDebugAtProd": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "enablePerformanceTimer": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "enableFastContextLogger": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
   "httpclient": {
-    "enableDNSCache": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "dnsCacheLookupInterval": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "dnsCacheMaxLength": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
+    "enableDNSCache": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "dnsCacheLookupInterval": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "dnsCacheMaxLength": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
     "request": {
-      "timeout": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "timeout": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "httpAgent": {
-      "keepAlive": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "freeSocketTimeout": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "maxSockets": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "maxFreeSockets": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "keepAlive": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "freeSocketTimeout": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "maxSockets": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "maxFreeSockets": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
     "httpsAgent": {
-      "keepAlive": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "freeSocketTimeout": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "maxSockets": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-      "maxFreeSockets": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+      "keepAlive": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "freeSocketTimeout": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "maxSockets": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+      "maxFreeSockets": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
     },
-    "useHttpClientNext": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "useHttpClientNext": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
   "meta": {
-    "enable": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "logging": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "enable": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "logging": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
-  "coreMiddleware": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "workerStartTimeout": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-  "serverTimeout": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
+  "coreMiddleware": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "workerStartTimeout": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+  "serverTimeout": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
   "clusterClient": {
-    "maxWaitTime": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js",
-    "responseTimeout": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+    "maxWaitTime": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js",
+    "responseTimeout": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
   },
-  "onClientError": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/config.default.js"
+  "onClientError": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\config.default.js"
 }

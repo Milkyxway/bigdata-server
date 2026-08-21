@@ -1,0 +1,56 @@
+{
+  "rules": [
+    {
+      "description": "广电站查询：如果需求提到\"xx广电站\"，WHERE 条件写成 district_name LIKE '%xx%'（不要用 = 精确匹配）",
+      "details": []
+    },
+    {
+      "description": "客户明细查询：如果需求带有\"客户明细\"，取以下字段：",
+      "details": [
+        "SELECT c.cust_code AS \"客户证号\", c.district_name AS \"广电站\", c.party_name AS \"客户姓名\", c.cont_number AS \"联系电话1\", c.cont_number2 AS \"联系电话2\", c.family_number AS \"家庭号1\", c.family_number2 AS \"家庭号2\", c.stand_name AS \"站点名称\" FROM rep2.rep_fact_cust_info_yyyymmdd c"
+      ]
+    },
+    {
+      "description": "客户明细到网格：如果需求提到\"客户明细\"且要\"到网格\"或\"网格名称\"，JOIN SZJFGRID.CUST_TOJF grid_rel ON c.cust_code = grid_rel.cust_code(+) LEFT JOIN szjfgrid.grid_tojf grid ON grid_rel.ms_area_id = grid.grid_id(+)，并额外取 grid.grid_name AS \"网格名称\"",
+      "details": []
+    },
+    {
+      "description": "缴费客户：需求提到\"缴费客户\"即数字电视缴费或宽带缴费或互动缴费，条件为 rep2.rep_fact_um_subscriber_yyyymmdd 中 is_paied = 1 OR is_lan_paied = 1 OR is_dbitv_paied = 1",
+      "details": []
+    },
+    {
+      "description": "产品明细：需求提到\"产品明细\"时，取 rep2.rep_fact_ins_srvpkg_yyyymmdd 的 SRVPKG_NAME, SRVPKG_ID, CREATE_DATE, VALID_DATE, EXPIRE_DATE, SUBSCRIBER_INS_ID",
+      "details": []
+    },
+    {
+      "description": "二合一/三合一终端：需求提到\"二合一\"、\"三合一\"、\"二合一三合一\"或\"光猫\"时，条件为 files2.um_res 的 RES_SKU_ID IN ('1153930','1153929','1153909','1151326','552044690','11538006','11538003')",
+      "details": []
+    },
+    {
+      "description": "附件Excel处理：如果用户消息中包含\"附件Excel内容如下\"，说明用户上传了Excel文件。需要将Excel中的字段值作为SQL的查询条件（如 WHERE IN、JOIN ON、多条件OR等），根据Excel列名匹配skill中对应的表字段，合理使用Excel中的值生成查询SQL",
+      "details": []
+    },
+    {
+      "description": "客户证号转换：需求中\"851001\"开头的数字都是客户证号（cust_code）。如果需求提到\"客户证号\"或 cust_code，但查询的目标表只有 cust_id 没有 cust_code，必须 JOIN cp2.cm_customer 或 rep2.rep_fact_cust_info_yyyymmdd 通过 cust_id 关联来获取或过滤 cust_code",
+      "details": []
+    }
+  ],
+  "fewShotExamples": [
+    {
+      "requirement": "查询无锡地区昨天新开通的宽带用户数，按广电站分组",
+      "sql": "SELECT t.district_name AS \"广电站\", COUNT(DISTINCT s.subscriber_ins_id) AS \"新增宽带用户数\"\nFROM rep2.rep_fact_ins_srvpkg_20260811 t\nJOIN files2.um_subscriber s ON t.subscriber_ins_id = s.subscriber_ins_id\nWHERE t.prod_service_id = '1004'\n  AND t.srvpkg_state = '1'\n  AND t.srvpkg_os_status IS NULL\n  AND s.corp_org_id = '3303'\n  AND t.create_date >= TO_CHAR(TRUNC(SYSDATE)-1, 'YYYYMMDD')\n  AND t.create_date < TO_CHAR(TRUNC(SYSDATE), 'YYYYMMDD')\nGROUP BY t.district_name"
+    },
+    {
+      "requirement": "查询本月各业务类型的订购量",
+      "sql": "SELECT CASE PROD_SERVICE_ID WHEN '1002' THEN '电视' WHEN '1003' THEN '互动' WHEN '1004' THEN '宽带' WHEN '1005' THEN '付费节目' WHEN '1006' THEN '互动点播' WHEN '1008' THEN '增值业务' ELSE '未知' END AS \"业务类型\", COUNT(*) AS \"订购量\"\nFROM rep2.rep_fact_ins_srvpkg_20260811\nWHERE srvpkg_state = '1'\n  AND srvpkg_os_status IS NULL\n  AND create_date >= TO_CHAR(TRUNC(SYSDATE, 'MM'), 'YYYYMMDD')\nGROUP BY PROD_SERVICE_ID"
+    },
+    {
+      "requirement": "查询当前所有欠费客户的欠费总额",
+      "sql": "SELECT c.cust_code AS \"客户证号\", c.cust_id AS \"客户ID\", SUM(ROUND(NVL(u.fee, 0)/100, 2)) AS \"欠费总额(元)\"\nFROM rep2.rep_fact_unpay_20260811 u\nJOIN files2.cm_account a ON u.acct_id = a.acct_id\nJOIN rep2.rep_fact_cust_info_20260811 c ON a.cust_id = c.cust_id\nGROUP BY c.cust_code, c.cust_id\nORDER BY SUM(ROUND(NVL(u.fee, 0)/100, 2)) DESC"
+    },
+    {
+      "requirement": "查询cust_code为'xxxx'的客户在2025年1月到2026年8月的点播记录明细",
+      "sql": "SELECT DISTINCT db.*\nFROM files2.um_subscriber um\nJOIN cp2.cm_customer c ON um.cust_id = c.cust_id\nJOIN (\n  SELECT * FROM dwd.dwd_all_movie_detail_202501\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202502\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202503\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202504\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202505\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202506\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202507\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202508\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202509\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202510\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202511\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202512\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202601\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202602\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202603\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202604\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202605\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202606\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202607\n  UNION ALL SELECT * FROM dwd.dwd_all_movie_detail_202608\n) db ON db.clientid = um.bill_id\nWHERE c.cust_code = 'xxxx'\n  AND um.expire_date > SYSDATE\n  AND um.subscriber_type = 1\n  AND um.bill_id != '0'"
+    }
+  ]
+}

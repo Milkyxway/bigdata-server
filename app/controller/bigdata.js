@@ -264,6 +264,61 @@ class BigDataController extends Controller {
 		}
 		ctx.res.end();
 	}
+
+	async mergeDaily() {
+		const { ctx, service } = this;
+		const files = ctx.request.files;
+		if (!files || files.length < 2) {
+			return ctx.sendError('请上传模板表(template)和至少一个日报文件(dailyReports)');
+		}
+
+		const templateFile = files.find(f => f.fieldname === 'template');
+		const dailyFiles = files.filter(f => f.fieldname === 'dailyReports');
+
+		if (!templateFile) {
+			return ctx.sendError('请上传模板表，字段名为 template');
+		}
+		if (dailyFiles.length === 0) {
+			return ctx.sendError('请上传至少一个日报文件，字段名为 dailyReports');
+		}
+
+		try {
+			const XLSX = require('xlsx');
+
+			const templateWb = XLSX.readFile(templateFile.filepath);
+			const templateSheet = templateWb.Sheets[templateWb.SheetNames[0]];
+			const templateData = XLSX.utils.sheet_to_json(templateSheet, { header: 1 });
+			const templateHeaders = templateData[0];
+			const templateRows = templateData.slice(1);
+
+			const parsedDailyFiles = [];
+			for (const file of dailyFiles) {
+				const wb = XLSX.readFile(file.filepath);
+				const sheet = wb.Sheets[wb.SheetNames[0]];
+				const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+				parsedDailyFiles.push({
+					filename: file.filename,
+					headers: data[0],
+					rows: data.slice(1),
+				});
+			}
+
+			const mergedData = await service.aiSql.mergeDailyReports(templateHeaders, templateRows, parsedDailyFiles);
+
+			const outputWb = XLSX.utils.book_new();
+			const outputData = [templateHeaders, ...mergedData];
+			const outputSheet = XLSX.utils.aoa_to_sheet(outputData);
+			XLSX.utils.book_append_sheet(outputWb, outputSheet, '合并结果');
+
+			const buffer = XLSX.write(outputWb, { type: 'buffer', bookType: 'xlsx' });
+
+			ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			ctx.set('Content-Disposition', 'attachment; filename=merged_daily_report.xlsx');
+			ctx.body = buffer;
+		} catch (e) {
+			return ctx.sendError(e.message || '日报合并失败');
+		}
+	}
 }
 
 module.exports = BigDataController;

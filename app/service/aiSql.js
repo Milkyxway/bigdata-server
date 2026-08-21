@@ -3,10 +3,12 @@ const fs = require('fs');
 const path = require('path');
 
 let TABLE_SCHEMA = null;
+let RULES_CACHE = null;
 
 function loadTableSchema(baseDir) {
 	if (TABLE_SCHEMA) return TABLE_SCHEMA;
 	const skillPath = path.join(baseDir, 'app', 'sql-skill.md');
+	if (!fs.existsSync(skillPath)) return '';
 	const raw = fs.readFileSync(skillPath, 'utf-8');
 	const idx = raw.indexOf('## 表关联关系');
 	if (idx !== -1) {
@@ -17,7 +19,20 @@ function loadTableSchema(baseDir) {
 	return TABLE_SCHEMA;
 }
 
-const SQL_RULES = `
+function loadRulesAndExamples(baseDir) {
+	if (RULES_CACHE) return RULES_CACHE;
+	const rulesPath = path.join(baseDir, 'app', 'skill-rules.json');
+	if (!fs.existsSync(rulesPath)) return { rules: [], fewShotExamples: [] };
+	RULES_CACHE = JSON.parse(fs.readFileSync(rulesPath, 'utf-8'));
+	return RULES_CACHE;
+}
+
+function reloadAll() {
+	TABLE_SCHEMA = null;
+	RULES_CACHE = null;
+}
+
+const STATIC_RULES = `
 # 核心工作原则
 1. 安全第一：绝不猜测敏感字段含义，若不确定字段是否敏感，默认不使用该字段进行查询或过滤
 2. 性能优先：默认使用最优写法，避免全表扫描，合理使用索引字段
@@ -40,21 +55,6 @@ const SQL_RULES = `
 2. 月分区表（以 yyyymm 结尾）：必须拼接 2026 年以来所有月份 UNION ALL
    - 例如：rep2.rep_fact_payoff_consume_detail_202601 UNION ALL ... UNION ALL rep2.rep_fact_payoff_consume_detail_202608
 
-# 业务口径（重要！）
-1. 广电站查询：如果需求提到"xx广电站"，WHERE 条件写成 district_name LIKE '%xx%'（不要用 = 精确匹配）
-2. 客户明细查询：如果需求带有"客户明细"，取以下字段：
-   SELECT c.cust_code AS "客户证号", c.district_name AS "广电站", c.party_name AS "客户姓名",
-          c.cont_number AS "联系电话1", c.cont_number2 AS "联系电话2",
-          c.family_number AS "家庭号1", c.family_number2 AS "家庭号2",
-          c.stand_name AS "站点名称"
-   FROM rep2.rep_fact_cust_info_yyyymmdd c
-3. 客户明细到网格：如果需求提到"客户明细"且要"到网格"或"网格名称"，JOIN SZJFGRID.CUST_TOJF grid_rel ON c.cust_code = grid_rel.cust_code(+)
-   LEFT JOIN szjfgrid.grid_tojf grid ON grid_rel.ms_area_id = grid.grid_id(+)，并额外取 grid.grid_name AS "网格名称"
-4. 缴费客户：需求提到"缴费客户"即数字电视缴费或宽带缴费或互动缴费，条件为 rep2.rep_fact_um_subscriber_yyyymmdd 中 is_paied = 1 OR is_lan_paied = 1 OR is_dbitv_paied = 1
-5. 产品明细：需求提到"产品明细"时，取 rep2.rep_fact_ins_srvpkg_yyyymmdd 的 SRVPKG_NAME, SRVPKG_ID, CREATE_DATE, VALID_DATE, EXPIRE_DATE, SUBSCRIBER_INS_ID
-6. 二合一/三合一终端：需求提到"二合一"、"三合一"、"二合一三合一"或"光猫"时，条件为 files2.um_res 的 RES_SKU_ID IN ('1153930','1153929','1153909','1151326','552044690','11538006','11538003')
-7. 附件Excel处理：如果用户消息中包含"附件Excel内容如下"，说明用户上传了Excel文件。需要将Excel中的字段值作为SQL的查询条件（如 WHERE IN、JOIN ON、多条件OR等），根据Excel列名匹配skill中对应的表字段，合理使用Excel中的值生成查询SQL
-
 # 输出格式
 只输出完整的 Oracle SQL 语句（不含分号），不要输出任何解释说明。
 SQL 中关键字大写（SELECT, FROM, WHERE, JOIN），表名/字段名保持原样。
@@ -64,54 +64,35 @@ SQL 第一行必须写注释 -- 由AI生成，请人工审核
 class AiSqlService extends Service {
 	_buildSystemPrompt() {
 		const tableSchema = loadTableSchema(this.app.baseDir);
+		const { rules, fewShotExamples } = loadRulesAndExamples(this.app.baseDir);
+
+		let businessRules = '';
+		if (rules.length > 0) {
+			businessRules = '\n# 业务口径（重要！）\n';
+			rules.forEach((r, i) => {
+				businessRules += `${i + 1}. ${r.description}\n`;
+				(r.details || []).forEach(d => {
+					businessRules += `   ${d}\n`;
+				});
+			});
+		}
+
+		let examples = '';
+		if (fewShotExamples.length > 0) {
+			examples = '\n## Few-Shot 示例\n';
+			fewShotExamples.forEach(ex => {
+				examples += `\n**需求**：${ex.requirement}\n\n**返回**：\n\`\`\`sql\n${ex.sql}\n\`\`\`\n`;
+			});
+		}
+
 		return `你是一名拥有 10 年经验的 Oracle 数据库开发专家，擅长 OLTP 系统的 Ad-hoc 查询（提数）和报表统计。
 根据用户需求编写高效、准确的 Oracle SQL（支持 11g/12c/19c），适用于 PL/SQL Developer 直接执行。
 
 ${tableSchema}
 
-${SQL_RULES}
-
-## Few-Shot 示例
-
-**需求**：查询无锡地区昨天新开通的宽带用户数，按广电站分组
-
-**返回**：
-\`\`\`sql
-SELECT t.district_name AS "广电站", COUNT(DISTINCT s.subscriber_ins_id) AS "新增宽带用户数"
-FROM rep2.rep_fact_ins_srvpkg_20260811 t
-JOIN files2.um_subscriber s ON t.subscriber_ins_id = s.subscriber_ins_id
-WHERE t.prod_service_id = '1004'
-  AND t.srvpkg_state = '1'
-  AND t.srvpkg_os_status IS NULL
-  AND s.corp_org_id = '3303'
-  AND t.create_date >= TO_CHAR(TRUNC(SYSDATE)-1, 'YYYYMMDD')
-  AND t.create_date < TO_CHAR(TRUNC(SYSDATE), 'YYYYMMDD')
-GROUP BY t.district_name
-\`\`\`
-
-**需求**：查询本月各业务类型的订购量
-
-**返回**：
-\`\`\`sql
-SELECT CASE PROD_SERVICE_ID WHEN '1002' THEN '电视' WHEN '1003' THEN '互动' WHEN '1004' THEN '宽带' WHEN '1005' THEN '付费节目' WHEN '1006' THEN '互动点播' WHEN '1008' THEN '增值业务' ELSE '未知' END AS "业务类型", COUNT(*) AS "订购量"
-FROM rep2.rep_fact_ins_srvpkg_20260811
-WHERE srvpkg_state = '1'
-  AND srvpkg_os_status IS NULL
-  AND create_date >= TO_CHAR(TRUNC(SYSDATE, 'MM'), 'YYYYMMDD')
-GROUP BY PROD_SERVICE_ID
-\`\`\`
-
-**需求**：查询当前所有欠费客户的欠费总额
-
-**返回**：
-\`\`\`sql
-SELECT c.cust_code AS "客户证号", c.cust_id AS "客户ID", SUM(ROUND(NVL(u.fee, 0)/100, 2)) AS "欠费总额(元)"
-FROM rep2.rep_fact_unpay_20260811 u
-JOIN files2.cm_account a ON u.acct_id = a.acct_id
-JOIN rep2.rep_fact_cust_info_20260811 c ON a.cust_id = c.cust_id
-GROUP BY c.cust_code, c.cust_id
-ORDER BY SUM(ROUND(NVL(u.fee, 0)/100, 2)) DESC
-\`\`\`
+${STATIC_RULES}
+${businessRules}
+${examples}
 
 现在请根据以下用户需求生成SQL：`;
 	}
@@ -163,6 +144,7 @@ ORDER BY SUM(ROUND(NVL(u.fee, 0)/100, 2)) DESC
 	}
 
 	async generate(requirement, attachmentText) {
+		this.ctx.service.skillConfig.savePrompt(requirement);
 		const stream = await this._callApi(requirement, attachmentText);
 		const reader = stream.getReader();
 		const decoder = new TextDecoder();
@@ -204,6 +186,7 @@ ORDER BY SUM(ROUND(NVL(u.fee, 0)/100, 2)) DESC
 	}
 
 	async *generateStream(requirement, attachmentText) {
+		this.ctx.service.skillConfig.savePrompt(requirement);
 		const stream = await this._callApi(requirement, attachmentText);
 		const reader = stream.getReader();
 		const decoder = new TextDecoder();
@@ -242,8 +225,77 @@ ORDER BY SUM(ROUND(NVL(u.fee, 0)/100, 2)) DESC
 			.replace(/```sql\s*/gi, '')
 			.replace(/```\s*/g, '')
 			.trim();
-		yield { type: 'done', sql };
+		yield { type: 'done', sql, prompt: requirement };
+	}
+
+	async mergeDailyReports(templateHeaders, templateRows, dailyFiles) {
+		let prompt = `你是一个数据处理助手。请将以下多个日报表的数据合并到模板表格式中。
+
+## 模板表格式
+列名：${templateHeaders.join(', ')}
+
+样例数据：
+`;
+		for (const row of templateRows.slice(0, 5)) {
+			prompt += row.map(c => c != null ? String(c) : '').join('\t') + '\n';
+		}
+
+		prompt += '\n## 日报表数据\n';
+		for (const daily of dailyFiles) {
+			prompt += `\n### ${daily.filename}\n列名：${daily.headers.join(', ')}\n数据：\n`;
+			for (const row of daily.rows) {
+				prompt += row.map(c => c != null ? String(c) : '').join('\t') + '\n';
+			}
+		}
+
+		prompt += `\n请将以上所有日报表的数据，按照模板表的列名进行匹配和合并，返回一个JSON数组，每个元素是一行数据，数组元素的顺序与模板表列名一致。
+
+注意：
+1. 日报表的列名可能与模板表不完全一致，请根据语义进行匹配合并
+2. 如果日报表中缺少模板表的某些列，对应位置留空字符串
+3. 数值类型保持原样，不要添加千分位逗号或特殊格式
+4. 只返回JSON数组，不要任何其他文字说明
+
+返回格式示例：
+[["值1","值2","值3"],["值4","值5","值6"]]`;
+
+		const { apiKey, baseURL, model, timeout } = this.config.deepseek;
+		const url = `${baseURL}/chat/completions`;
+
+		const resp = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${apiKey}`,
+			},
+			body: JSON.stringify({
+				model,
+				messages: [
+					{ role: 'user', content: prompt },
+				],
+				temperature: 0.1,
+				max_tokens: 16384,
+				stream: false,
+			}),
+			signal: AbortSignal.timeout(timeout || 120000),
+		});
+
+		if (!resp.ok) {
+			const errText = await resp.text();
+			throw new Error(`API返回错误(${resp.status}): ${errText.substring(0, 200)}`);
+		}
+
+		const data = await resp.json();
+		const content = data.choices?.[0]?.message?.content || '';
+
+		const jsonMatch = content.match(/\[[\s\S]*\]/);
+		if (!jsonMatch) {
+			throw new Error('AI未返回有效数据，请重试');
+		}
+
+		return JSON.parse(jsonMatch[0]);
 	}
 }
 
 module.exports = AiSqlService;
+module.exports.reloadAll = reloadAll;

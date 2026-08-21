@@ -89,7 +89,7 @@
     "onerror": {
       "errorPageUrl": "",
       "appErrorFilter": null,
-      "templatePath": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-onerror@2.2.0@egg-onerror/lib/onerror_page.mustache"
+      "templatePath": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-onerror\\lib\\onerror_page.mustache"
     },
     "i18n": {
       "defaultLocale": "en_US",
@@ -100,10 +100,10 @@
       "cookieMaxAge": "1y"
     },
     "watcher": {
-      "type": "development",
+      "type": "default",
       "eventSources": {
-        "default": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-watcher@3.1.1@egg-watcher/lib/event-sources/default",
-        "development": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-watcher@3.1.1@egg-watcher/lib/event-sources/development"
+        "default": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-watcher\\lib\\event-sources\\default",
+        "development": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-watcher\\lib\\event-sources\\development"
       }
     },
     "customLogger": {
@@ -123,7 +123,7 @@
       "fieldNameSize": 100,
       "fieldSize": "100kb",
       "fields": 10,
-      "fileSize": "10mb",
+      "fileSize": "50mb",
       "files": 10,
       "fileExtensions": [],
       "whitelist": [
@@ -131,19 +131,11 @@
         ".sql"
       ],
       "allowArrayField": false,
-      "tmpdir": "/var/folders/0j/xvwv91px5wg501x7rpr3k_3h0000gn/T/egg-multipart-tmp/task-backend",
+      "tmpdir": "C:\\Users\\xjsww\\AppData\\Local\\Temp\\egg-multipart-tmp\\task-backend",
       "cleanSchedule": {
         "cron": "0 30 4 * * *",
         "disable": false
       }
-    },
-    "development": {
-      "watchDirs": [],
-      "ignoreDirs": [],
-      "fastReady": false,
-      "reloadOnDebug": true,
-      "overrideDefault": false,
-      "overrideIgnore": false
     },
     "logrotator": {
       "filesRotateByHour": null,
@@ -156,15 +148,16 @@
     },
     "static": {
       "prefix": "/public/",
-      "dir": "/Users/xujiashuang/Desktop/bigdata-server/app/public",
+      "dir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\app\\public",
       "dynamic": true,
       "preload": false,
-      "buffer": false,
-      "maxFiles": 1000
+      "buffer": true,
+      "maxFiles": 1000,
+      "maxAge": 31536000
     },
     "view": {
-      "root": "/Users/xujiashuang/Desktop/bigdata-server/app/view",
-      "cache": false,
+      "root": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\app\\view",
+      "cache": true,
       "defaultExtension": ".html",
       "defaultViewEngine": "",
       "mapping": {}
@@ -179,8 +172,8 @@
       "client": {
         "host": "localhost",
         "port": "3306",
-        "user": "root",
-        "password": "<String len: 8>",
+        "user": "bigdata_period",
+        "password": "<String len: 16>",
         "database": "bigdata_period"
       }
     },
@@ -188,7 +181,7 @@
       "origin": "*",
       "allowMethods": "GET,HEAD,PUT,POST,DELETE,PATCH"
     },
-    "env": "local",
+    "env": "prod",
     "name": "task-backend",
     "keys": "<String len: 31>",
     "cookies": {},
@@ -214,7 +207,9 @@
         "egg-scripts": "^2",
         "ftp": "^0.3.10",
         "mkdirp": "^3.0.1",
-        "moment": "^2.29.4"
+        "moment": "^2.29.4",
+        "ssh2-sftp-client": "^12.1.1",
+        "xlsx": "^0.18.5"
       },
       "devDependencies": {
         "egg-bin": "^5",
@@ -248,9 +243,9 @@
       "author": "xjs",
       "license": "MIT"
     },
-    "baseDir": "/Users/xujiashuang/Desktop/bigdata-server",
-    "HOME": "/Users/xujiashuang",
-    "rundir": "/Users/xujiashuang/Desktop/bigdata-server/run",
+    "baseDir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server",
+    "HOME": "C:\\Users\\xjsww",
+    "rundir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\run",
     "dump": {
       "ignore": "<Set>",
       "timing": {
@@ -286,21 +281,19 @@
       "onerror": "<Function onerror>"
     },
     "logger": {
-      "dir": "/Users/xujiashuang/Desktop/bigdata-server/logs/task-backend",
+      "dir": "C:\\Users\\xjsww\\logs\\task-backend",
       "encoding": "utf8",
-      "env": "local",
+      "env": "prod",
       "level": "INFO",
       "consoleLevel": "INFO",
-      "disableConsoleAfterReady": false,
+      "disableConsoleAfterReady": true,
       "outputJSON": false,
       "buffer": true,
       "appLogName": "task-backend-web.log",
       "coreLogName": "egg-web.log",
       "agentLogName": "egg-agent.log",
       "errorLogName": "common-error.log",
-      "coreLogger": {
-        "consoleLevel": "WARN"
-      },
+      "coreLogger": {},
       "allowDebugAtProd": false,
       "enablePerformanceTimer": false,
       "enableFastContextLogger": false,
@@ -354,6 +347,19 @@
     },
     "onClientError": null,
     "middleware": [],
+    "pushSftp": {
+      "host": "172.16.176.76",
+      "port": 22,
+      "username": "root",
+      "password": "<String len: 10>",
+      "targetDir": "/opt/data-dashboard/uploads"
+    },
+    "deepseek": {
+      "apiKey": "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG",
+      "model": "deepseek-v4-pro",
+      "baseURL": "http://modelrouter.js96296.com/v1",
+      "timeout": 120000
+    },
     "uploadDir": "app/public/upload",
     "uploadReport": "app/public/report",
     "coreMiddlewares": "~config~coreMiddleware",
@@ -370,8 +376,8 @@
         "jsonp"
       ],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-onerror@2.2.0@egg-onerror",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-onerror",
       "version": "2.2.0"
     },
     "session": {
@@ -381,8 +387,8 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-session@3.3.0@egg-session",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-session",
       "version": "3.3.0"
     },
     "i18n": {
@@ -392,8 +398,8 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-i18n@2.1.1@egg-i18n",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-i18n",
       "version": "2.1.1"
     },
     "watcher": {
@@ -403,12 +409,9 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-watcher@3.1.1@egg-watcher",
-      "version": "3.1.1",
-      "dependents": [
-        "development"
-      ]
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-watcher",
+      "version": "3.1.1"
     },
     "multipart": {
       "enable": true,
@@ -419,8 +422,8 @@
         "schedule"
       ],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-multipart@3.3.0@egg-multipart",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-multipart",
       "version": "3.3.0"
     },
     "security": {
@@ -432,12 +435,12 @@
         "session"
       ],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-security@3.1.0@egg-security",
-      "version": "3.1.0"
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-security",
+      "version": "3.0.0"
     },
     "development": {
-      "enable": true,
+      "enable": false,
       "package": "egg-development",
       "name": "development",
       "dependencies": [
@@ -447,8 +450,8 @@
       "env": [
         "local"
       ],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-development@2.7.0@egg-development",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-development",
       "version": "2.7.0"
     },
     "logrotator": {
@@ -460,8 +463,8 @@
       ],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-logrotator@3.1.0@egg-logrotator",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-logrotator",
       "version": "3.1.0"
     },
     "schedule": {
@@ -471,8 +474,8 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-schedule@4.0.0@egg-schedule",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-schedule",
       "version": "4.0.0",
       "dependents": [
         "logrotator"
@@ -485,8 +488,8 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-static@2.3.1@egg-static",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-static",
       "version": "2.3.1"
     },
     "jsonp": {
@@ -498,8 +501,8 @@
         "security"
       ],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-jsonp@2.0.0@egg-jsonp",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-jsonp",
       "version": "2.0.0"
     },
     "view": {
@@ -509,8 +512,8 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg@3.17.5@egg/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-view@2.1.4@egg-view",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-view",
       "version": "2.1.4"
     },
     "mysql": {
@@ -520,8 +523,8 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-mysql@4.0.0@egg-mysql",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-mysql",
       "version": "4.0.0"
     },
     "cors": {
@@ -531,17 +534,17 @@
       "dependencies": [],
       "optionalDependencies": [],
       "env": [],
-      "from": "/Users/xujiashuang/Desktop/bigdata-server/config/plugin.js",
-      "path": "/Users/xujiashuang/Desktop/bigdata-server/node_modules/_egg-cors@2.2.3@egg-cors",
+      "from": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\config\\plugin.js",
+      "path": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server\\node_modules\\egg-cors",
       "version": "2.2.3"
     }
   },
   "appInfo": {
     "name": "task-backend",
-    "baseDir": "/Users/xujiashuang/Desktop/bigdata-server",
-    "env": "local",
+    "baseDir": "C:\\Users\\xjsww\\Desktop\\workspace\\bigdata-server",
+    "env": "prod",
     "scope": "",
-    "HOME": "/Users/xujiashuang",
+    "HOME": "C:\\Users\\xjsww",
     "pkg": {
       "name": "task-backend",
       "version": "1.0.0",
@@ -558,7 +561,9 @@
         "egg-scripts": "^2",
         "ftp": "^0.3.10",
         "mkdirp": "^3.0.1",
-        "moment": "^2.29.4"
+        "moment": "^2.29.4",
+        "ssh2-sftp-client": "^12.1.1",
+        "xlsx": "^0.18.5"
       },
       "devDependencies": {
         "egg-bin": "^5",
@@ -592,6 +597,6 @@
       "author": "xjs",
       "license": "MIT"
     },
-    "root": "/Users/xujiashuang/Desktop/bigdata-server"
+    "root": "C:\\Users\\xjsww"
   }
 }

@@ -81,6 +81,7 @@ module.exports = (appInfo) => {
 	config.multipart = {
 		mode: "file",
 		whitelist: [".xlsx", ".sql"],
+		fileSize: '50mb',
 	};
 	config.cluster = {
 		listen: {
