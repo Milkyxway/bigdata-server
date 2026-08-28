@@ -4,6 +4,8 @@ const path = require('path');
 
 let TABLE_SCHEMA = null;
 let RULES_CACHE = null;
+let REPORT_CATALOG = null;
+let REPORT_CATALOG_TIME = 0;
 
 function loadTableSchema(baseDir) {
 	if (TABLE_SCHEMA) return TABLE_SCHEMA;
@@ -30,6 +32,8 @@ function loadRulesAndExamples(baseDir) {
 function reloadAll() {
 	TABLE_SCHEMA = null;
 	RULES_CACHE = null;
+	REPORT_CATALOG = null;
+	REPORT_CATALOG_TIME = 0;
 }
 
 const STATIC_RULES = `
@@ -39,7 +43,7 @@ const STATIC_RULES = `
 3. 结果可读：列名使用中文别名（双引号包裹），金额/小数格式化
 
 # SQL 书写铁律（必须遵守）
-1. 严禁 SELECT *，必须显式列出字段
+1. 严禁 SELECT *，必须显式列出字段。但如果用户需求中明确提到"所有字段"或"全部字段"，则使用 SELECT *
 2. 时间过滤：WHERE 条件中涉及时间的，必须命中索引字段，格式为：
    - 今日：COLUMN >= TRUNC(SYSDATE)
    - 昨日：COLUMN >= TRUNC(SYSDATE)-1 AND COLUMN < TRUNC(SYSDATE)
@@ -62,7 +66,37 @@ SQL 第一行必须写注释 -- 由AI生成，请人工审核
 用 \`\`\`sql 代码块包裹。`;
 
 class AiSqlService extends Service {
-	_buildSystemPrompt() {
+	async _loadReportCatalog() {
+		const now = Date.now();
+		if (REPORT_CATALOG && (now - REPORT_CATALOG_TIME) < 5 * 60 * 1000) {
+			return REPORT_CATALOG;
+		}
+		try {
+			const sql = `SELECT rl.reportId, rl.reportName, rs.reportSqlData
+				FROM report_list rl
+				LEFT JOIN report_type rt ON rl.reportTypeId = rt.reportTypeId
+				LEFT JOIN report_sql rs ON rl.reportId = rs.reportId
+				WHERE rl.reportState = 1 AND rt.reportTypeName = '日报'
+				ORDER BY rl.reportId, rs.reportSqlId`;
+			const rows = await this.app.mysql.query(sql);
+			const catalog = {};
+			for (const row of rows) {
+				if (!row.reportName || !row.reportSqlData) continue;
+				if (!catalog[row.reportName]) {
+					catalog[row.reportName] = [];
+				}
+				catalog[row.reportName].push(row.reportSqlData);
+			}
+			REPORT_CATALOG = catalog;
+			REPORT_CATALOG_TIME = now;
+			return catalog;
+		} catch (e) {
+			this.app.logger.warn('[aiSql] 加载日报SQL目录失败:', e.message);
+			return REPORT_CATALOG || {};
+		}
+	}
+
+	async _buildSystemPrompt() {
 		const tableSchema = loadTableSchema(this.app.baseDir);
 		const { rules, fewShotExamples } = loadRulesAndExamples(this.app.baseDir);
 
@@ -85,6 +119,29 @@ class AiSqlService extends Service {
 			});
 		}
 
+		let reportCatalog = '';
+		const catalog = await this._loadReportCatalog();
+		const reportNames = Object.keys(catalog);
+		if (reportNames.length > 0) {
+			reportCatalog = '\n## 当前执行中的日报SQL参考\n';
+			reportCatalog += '当用户提到以下日报名称时，可参考对应SQL。日报SQL中 create table 的表名即固化表名（如 tmp_xxx_$4，$4为日期参数如20260731），可作为查询用的表。\n\n';
+			for (const name of reportNames) {
+				const sqls = catalog[name];
+				const tableNames = [];
+				for (const sql of sqls) {
+					const match = sql.match(/create\s+table\s+(\S+)\s/i);
+					if (match) tableNames.push(match[1]);
+				}
+				reportCatalog += `### ${name}\n`;
+				if (tableNames.length > 0) {
+					reportCatalog += `**固化表名**：${tableNames.join(', ')}\n\n`;
+				}
+				for (const sql of sqls) {
+					reportCatalog += `\`\`\`sql\n${sql}\n\`\`\`\n\n`;
+				}
+			}
+		}
+
 		return `你是一名拥有 10 年经验的 Oracle 数据库开发专家，擅长 OLTP 系统的 Ad-hoc 查询（提数）和报表统计。
 根据用户需求编写高效、准确的 Oracle SQL（支持 11g/12c/19c），适用于 PL/SQL Developer 直接执行。
 
@@ -92,13 +149,14 @@ ${tableSchema}
 
 ${STATIC_RULES}
 ${businessRules}
+${reportCatalog}
 ${examples}
 
 现在请根据以下用户需求生成SQL：`;
 	}
 
 	async _callApi(requirement, attachmentText) {
-		const systemPrompt = this._buildSystemPrompt();
+		const systemPrompt = await this._buildSystemPrompt();
 		const userMessage = attachmentText ? `${requirement}\n${attachmentText}` : requirement;
 		const { apiKey, baseURL, model, timeout } = this.config.deepseek;
 		const url = `${baseURL}/chat/completions`;

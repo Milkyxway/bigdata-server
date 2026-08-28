@@ -28,12 +28,7 @@ description: 专业的 Oracle SQL 提数助手。根据用户需求编写高效�
 ### 输出格式
 **Part 1 - 可执行 SQL**：```sql 代码块，关键字大写，表/字段小写，金额字段存的是分，统一 `/100` 保留两位：`ROUND(NVL(AMOUNT,0)/100, 2) AS "金额"`。
 
-**Part 2 - 口径说明**：
-- 过滤逻辑的业务含义
-- 性能瓶颈/数据盲区
-- 订购正常 = 产品订购状态为正常 + 停开机状态为正常
-- 月报（yyyymm结尾）需拼上 2026 年以来所有月报
-- 日报（yyyymmdd结尾）默认取 t-1 日期
+
 
 ## 示例
 **需求**：查询今天注册的用户ID和手机号。
@@ -75,107 +70,95 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 
 ## 表结构
 
-### params1.sec_developer（发展人表）
-| 字段名          | 类型         | 说明                                     |
-| :-------------- | :----------- | :--------------------------------------- |
-| dev_id          | NUMBER(18)   | 主键                                     |
-| dev_name        | VARCHAR2(20) | 发展人姓名                               |
-| department_name | VARCHAR2(20) | 发展人部门                               |
-| dev_phone       | VARCHAR2(20) | 发展人手机号                             |
-| corp_org        | VARCHAR2(20) | 所属公司 3303=无锡, 3328=江阴, 3330=宜兴 |
-| dev_state       | VARCHAR2(20) | 状态 0=正常                              |
 
-### rep.dwa_wage2_offer_ins_dev_yyyymm（产品订购订单发展人表）
-| 字段名            | 类型         | 说明         |
-| :---------------- | :----------- | :----------- |
-| CUST_ID           | NUMBER(18)   | 主键         |
-| CUST_CODE         | VARCHAR2(20) | 客户证号     |
-| offer_id          | VARCHAR2(20) | 产品ID       |
-| offer_name        | VARCHAR2(20) | 产品名称     |
-| dev_id_2026       | VARCHAR2(20) | 订单发展人ID |
-| CREATE_DATE       | VARCHAR2(20) | 产品订购时间 |
-| VALID_DATE        | VARCHAR2(20) | 产品生效时间 |
-| EXPIRE_DATE       | VARCHAR2(20) | 产品过期时间 |
-| SUBSCRIBER_INS_ID | VARCHAR2(20) | 终端ID       |
-| PROD_SERVICE_ID   | VARCHAR2(20) | 业务类型 1002=电视, 1003=互动, 1004=宽带, 1005=付费节目, 1006=互动点播, 1008=增值业务 |
 
-### rep.dwa_wage_pay_detail_dev_yyyymm（用户缴费带发展人表）
-| 字段名          | 类型               | 说明                     |
-| :-------------- | :----------------- | :----------------------- |
-| CUST_ID         | NUMBER(18)         | 主键                     |
-| CUST_CODE       | VARCHAR2(20)       | 客户证号                 |
-| TOTAL_AMOUNT    | NUMBER(20000000,2) | 总金额（元）             |
-| DEV_NAME        | VARCHAR2(20)       | 发展人姓名               |
-| DEPARTMENT_NAME | VARCHAR2(20)       | 发展人部门               |
-| DEV_PHONE       | VARCHAR2(20)       | 发展人手机号             |
-| ASSET_ITEM_ID   | VARCHAR2(20)       | 账本ID，100=通用现金账本 |
-| BUSINESS_TYPE   | VARCHAR2(20)       | 业务类型，10=缴费        |
-| CREATE_DATE     | VARCHAR2(20)       | 创建时间                 |
+### rep.dwa_wage_pay_detail_dev_yyyymm（收入提成明细（含发展人）表）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| CUST_ID | NUMBER(30) | 客户ID |
+| CUST_CODE | VARCHAR2(255) | 客户证号 |
+| ACCT_ID | NUMBER(30) | 账户ID |
+| BUSINESS_ID | NUMBER(30) | 业务ID |
+| INCOME_TYPE | NUMBER(30) | 收入类型 |
+| ACCT_BALANCE_ID | NUMBER(30) | 账户余额ID |
+| ASSET_ITEM_ID | NUMBER(30) | 账本ID，100=通用现金账本 |
+| AMOUNT | NUMBER(30) | 金额（分） |
+| COMMISSION_AMOUNT | NUMBER(30) | 提成金额 |
+| COMMISSION_RATIO | NUMBER(30) | 提成比例 |
+| COMMISSION_TYPE | VARCHAR2(106) | 提成类型 |
+| CREATE_DATE | DATE | 创建时间 |
+| BUSINESS_TYPE | NUMBER(30) | 业务类型，10=缴费 |
+| BUSINESS_TYPE_ID | NUMBER(30) | 业务类型ID |
+| CHANNEL_ID | NUMBER(30) | 渠道ID |
+| PAYMENT_MODE_ID | NUMBER(30) | 支付方式ID |
+| STAFF_ID | VARCHAR2(255) | 员工ID |
+| STAFF_NAME | VARCHAR2(200) | 员工姓名 |
+| STAFF_PHONE | VARCHAR2(50) | 员工手机号 |
+| STAFF_ORGANIZE_ID | VARCHAR2(255) | 员工组织ID |
+| STAFF_ORGANIZE_NAME | VARCHAR2(200) | 员工组织名称 |
+| TRADE_ORGANIZE_ID | NUMBER(30) | 交易组织ID |
+| TRADE_ORGANIZE_NAME | VARCHAR2(200) | 交易组织名称 |
+| REMARK | VARCHAR2(512) | 备注 |
+| NOTE_ID | NUMBER(30) | 票据ID |
+| DEV_ID | NUMBER(30) | 发展人ID |
+| DEV_NAME | VARCHAR2(255) | 发展人姓名 |
+| DEV_PHONE | VARCHAR2(50) | 发展人手机号 |
+| DEPARTMENT_NAME | VARCHAR2(511) | 部门名称 |
+| EXT_DEV_ID | VARCHAR2(20) | 扩展发展人ID |
+| CRM_DEV_ID | VARCHAR2(100) | CRM发展人ID |
+| ZG_CANCEL_DEV_ID | VARCHAR2(20) | 注销发展人ID |
+| CRM_CANCEL_DEV_ID | VARCHAR2(100) | CRM注销发展人ID |
+| IS_DTV_NEW | VARCHAR2(6) | 是否数字电视新装 |
+| IS_LAN_NEW | VARCHAR2(6) | 是否宽带新装 |
+| IS_MOBILE_NEW | VARCHAR2(6) | 是否移网新装 |
+| IS_RETURN | VARCHAR2(10) | 是否退费 |
+| IS_CANCEL | VARCHAR2(40) | 是否注销 |
+| IS_CASH | VARCHAR2(6) | 是否现金 |
+| STOP_DAYS | NUMBER(30) | 停机天数 |
+| RULE_DAYS | NUMBER(20) | 规则天数 |
+| DK | VARCHAR2(40) | 地市 |
+| CORP_ORG_ID | NUMBER(30) | 公司ID |
+| CORP_ORG_NAME | VARCHAR2(100) | 公司名称 |
+| MARK | VARCHAR2(255) | 标记 |
+| CUST_TYPE | NUMBER(30) | 客户类型 |
+| CUST_LEVEL | VARCHAR2(4) | 客户等级 |
+| CUST_PROP | VARCHAR2(1024) | 客户属性 |
+| MSDC_CORP_ID | VARCHAR2(200) | 市场公司ID |
+| MSDC_CORP_NAME | VARCHAR2(200) | 市场公司名称 |
+| MSDC_GDZ_ID | VARCHAR2(200) | 市场广电站ID |
+| MSDC_GDZ_NAME | VARCHAR2(200) | 市场广电站名称 |
+| MS_AREA_ID | VARCHAR2(24) | 网格ID |
+| MS_AREA_NAME | VARCHAR2(255) | 网格名称 |
+| ETL_DATE | DATE | ETL日期 |
 
 ### rep2.rep_fact_ins_srvpkg_yyyymmdd（产品订购表）
-| 字段名            | 类型         | 说明                                                                  |
-| :---------------- | :----------- | :-------------------------------------------------------------------- |
-| CUST_ID           | NUMBER(18)   | 主键                                                                  |
-| CUST_CODE         | VARCHAR2(20) | 客户证号                                                              |
-| SRVPKG_ID         | VARCHAR2(20) | 产品ID                                                                |
-| SRVPKG_NAME       | VARCHAR2(20) | 产品名称                                                              |
-| PROD_SERVICE_ID   | VARCHAR2(20) | 业务类型 1002=电视, 1003=互动, 1004=宽带, 1005=付费节目, 1006=互动点播, 1008=增值业务 |
-| SRVPKG_STATE      | VARCHAR2(20) | 订购状态 1=正常                                                       |
-| SRVPKG_OS_STATUS  | VARCHAR2(20) | 停开机 null=未停机, 1=欠费停机, 3=暂停                                |
-| CREATE_DATE       | VARCHAR2(20) | 订购时间                                                              |
-| VALID_DATE        | VARCHAR2(20) | 生效时间                                                              |
-| EXPIRE_DATE       | VARCHAR2(20) | 过期时间                                                              |
-| SUBSCRIBER_INS_ID | VARCHAR2(20) | 终端ID                                                                |
-
-### files2.um_subscriber（终端订阅实时表）
-| 字段名            | 类型         | 说明                                   |
-| :---------------- | :----------- | :------------------------------------- |
-| CUST_ID           | NUMBER(18)   | 主键                                   |
-| SUBSCRIBER_INS_ID | VARCHAR2(20) | 终端ID                                 |
-| CREATE_DATE       | VARCHAR2(20) | 创建时间                               |
-| BILL_ID           | VARCHAR2(20) | 机顶盒号                               |
-| subscriber_type   | VARCHAR2(20) | 订阅类型 1=电视, 3=宽带                |
-| expire_date       | VARCHAR2(20) | 终端过期时间                           |
-| login_name        | VARCHAR2(20) | 宽带账号                               |
-| corp_org_id       | VARCHAR2(20) | 市ID 3303=无锡, 3328=江阴, 3330=宜兴   |
-
-### rep2.rep_fact_cust_info_yyyymmdd（用户信息表）
-| 字段名        | 类型         | 说明                                                    |
-| :------------ | :----------- | :------------------------------------------------------ |
-| CUST_ID       | NUMBER(18)   | 主键                                                    |
-| CUST_CODE     | VARCHAR2(20) | 客户证号                                                |
-| CUST_STATUS   | VARCHAR2(2)  | 0=未激活, 1=正常, 2=冻结, 4=离网                        |
-| CREATE_TIME   | DATE         | 注册时间                                                |
-| district_name | VARCHAR2(20) | 所属广电站                                              |
-| cust_type     | VARCHAR2(20) | 客户类型 1=公众 2=商业 3=团体代付 4=合同商业            |
-| party_name    | VARCHAR2(20) | 客户姓名                                                |
-| cont_number   | VARCHAR2(20) | 联系电话1                                               |
-| cont_number2  | VARCHAR2(20) | 联系电话2                                               |
-| family_number | VARCHAR2(20) | 家庭号1                                                 |
-| family_number2| VARCHAR2(20) | 家庭号2                                                 |
-| stand_name    | VARCHAR2(20) | 站点名称                                                |
-
-### rep2.rep_fact_balance_yyyymmdd（用户余额表）
-| 字段名        | 类型         | 说明                                   |
-| :------------ | :----------- | :------------------------------------- |
-| acct_id       | NUMBER(18)   | 主键（关联 cm_account）                |
-| asset_item_id | VARCHAR2(20) | 账本ID，100=通用现金账本               |
-| balance       | VARCHAR2(2)  | 余额（分）                             |
-| etl_time      | DATE         | ETL时间                                |
-| corp_org_id   | VARCHAR2(20) | 市ID 3303=无锡, 3328=江阴, 3330=宜兴   |
-
-### rep2.rep_fact_unpay_yyyymmdd（用户欠费表）一个客户多账期欠费需累加
-| 字段名      | 类型         | 说明                                   |
-| :---------- | :----------- | :------------------------------------- |
-| acct_id     | NUMBER(18)   | 主键（关联 cm_account）                |
-| bill_month  | VARCHAR2(20) | 账期                                   |
-| fee         | VARCHAR2(2)  | 欠费金额（分）                         |
-| etl_time    | DATE         | ETL时间                                |
-| corp_org_id | VARCHAR2(20) | 市ID 3303=无锡, 3328=江阴, 3330=宜兴   |
-
-查询示例：`SELECT acct_id, SUM(fee)/100 AS "欠费金额" FROM rep2.rep_fact_unpay_yyyymmdd GROUP BY acct_id`
+> 日分区表，订购正常口径：srvpkg_state='1' AND srvpkg_os_status IS NULL
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| CUST_CODE | VARCHAR2(255) | 客户证号 |
+| CUST_ID | NUMBER(30) | 客户id |
+| SRVPKG_ID | NUMBER(30) | 产品id |
+| SRVPKG_NAME | VARCHAR2(255) | 产品名称 |
+| PROD_SERVICE_ID | NUMBER(30) | 业务类型 1002=电视, 1003=互动, 1004=宽带, 1005=付费节目, 1006=互动点播, 1008=增值业务 |
+| SUBSCRIBER_INS_ID | NUMBER(30) | 终端序列号 |
+| CREATE_DATE | DATE | 产品创建时间 |
+| VALID_DATE | DATE | 产品生效时间 |
+| EXPIRE_DATE | DATE | 失效时间 |
+| SRVPKG_STATE | VARCHAR2(255) | 产品订购状态 1=正常 |
+| SRVPKG_OS_STATUS | VARCHAR2(255) | 停开机状态 null=未停机, 1=欠费停机, 3=暂停 |
+| MAIN_SUBSCRIBER_INS_ID | NUMBER(30) | 主机 |
 
 ### rep2.rep_fact_payoff_consume_detail_yyyymm（月销账表）
+| 字段名        | 类型         | 说明                                                                  |
+| :------------ | :----------- | :-------------------------------------------------------------------- |
+| CUST_ID       | NUMBER(18)   | 主键                                                                  |
+| amount_type   | VARCHAR2(20) | 类型 5=销账                                                           |
+| total_amount  | VARCHAR2(2)  | 金额（分）                                                            |
+| mon           | VARCHAR2(20) | 账期                                                                  |
+| corp_org_id   | VARCHAR2(20) | 市ID 3303=无锡, 3328=江阴, 3330=宜兴                                  |
+| asset_item_id | VARCHAR2(20) | 账本科目（注意：此字段与其他表的 asset_item_id 含义不同）             |
+| service_id    | VARCHAR2(20) | 业务ID 1002=电视 1003=互动 1004=宽带 1005=付费节目 1006=互动点播 1008=增值业务 |
+### rep2.rep_fact_payoff_consume_detail_yyyy（存量年销账表2024、12025）
 | 字段名        | 类型         | 说明                                                                  |
 | :------------ | :----------- | :-------------------------------------------------------------------- |
 | CUST_ID       | NUMBER(18)   | 主键                                                                  |
@@ -232,24 +215,41 @@ FROM (
 | PAY_TYPE    | NUMBER(2)    | 支付方式 1=现金 2=支付宝 3=银行卡托收  |
 | PAY_MODE    | NUMBER(2)    | 1=预付费, 2=后付费                     |
 
-### cp2.cm_customer（客户主表）cust_code 转 cust_id 用
-| 字段名      | 类型         | 说明       |
-| :---------- | :----------- | :--------- |
-| CUST_ID     | NUMBER(16)   | 客户ID     |
-| CUST_CODE   | VARCHAR2(20) | 客户证号   |
-| CUST_STATUS | VARCHAR2(20) | 客户状态   |
-| create_date | DATE         | 开户时间   |
-| corp_org_id   | VARCHAR2(20) | 市ID 3303=无锡, 3328=江阴, 3330=宜兴                                  |
+
 
 ### rep.rep_fact_lan_cust_new_yyyymmdd（有价宽带终端表）
-| 字段名                  | 类型       | 说明                               |
-| :---------------------- | :--------- | :--------------------------------- |
-| CUST_ID                 | NUMBER(18) | 主键                               |
-| subscriber_ins_id       | NUMBER(18) | 终端序列号                         |
-| is_price_lan_paied_2026 | NUMBER(18) | 是否有价宽带缴费 1=已缴费, 0=未缴费    |
-| bandwidth               | NUMBER(18) | 宽带带宽                           |
-| srvpkg_name               | NUMBER(18) |  宽带产品                           |
-| srvpkg_id               | NUMBER(18) |  宽带产品ID                           |
+> 日分区表，有价宽带口径：is_price_lan_paied_2026 = 1（2026 年有价且已缴费）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| CORP_ORG_ID | NUMBER(30) | 市id 3303='无锡', 3328='江阴', 3330='宜兴' |
+| CUST_CODE | VARCHAR2(255) | 客户证号 |
+| CUST_ID | NUMBER(30) | 客户id |
+| DTV_COUNT | NUMBER(10) | 电视数量 |
+| IS_PAIED | NUMBER(10) | 是否缴费 |
+| IS_VALID1 | NUMBER(10) | 是否有效 |
+| LAN_PAIED_COUNT | NUMBER(10) | 宽带缴费数量 |
+| IS_LAN_VALID | NUMBER(30) | 宽带是否有效 |
+| IS_LAN_PAIED | NUMBER(30) | 宽带是否缴费 |
+| SUBSCRIBER_INS_ID | NUMBER(30) | 终端序列号 |
+| MAIN_SPEC_ID | NUMBER(30) | 主规格id |
+| BILL_ID | VARCHAR2(255) | 账单id |
+| SUB_BILL_ID | VARCHAR2(255) | 子账单id |
+| LOGIN_NAME | VARCHAR2(255) | 登录名 |
+| OFFER_ID | NUMBER(16) | 产品id |
+| OFFER_NAME | VARCHAR2(128) | 产品名称 |
+| BANDWIDTH | NUMBER(30) | 宽带带宽 |
+| OFFER_PRICE | VARCHAR2(500) | 产品价格 |
+| PRICE_END | NUMBER(30) | 价格结束 |
+| PRICE_TYPE | VARCHAR2(11) | 价格类型 |
+| OFFER_ITEM_CODE | NUMBER(9) | 产品项编码 |
+| OFFER_VALID_DATE | DATE | 产品生效日期 |
+| OFFER_EXPIRE_DATE | DATE | 产品过期日期 |
+| OFFER_CREATE_DATE | DATE | 产品创建日期 |
+| OFFER_DONE_DATE | DATE | 产品完成日期 |
+| IS_LAN_PRICED_PAIED_241231 | NUMBER(30) | 是否有价宽带缴费截至2024-12-31 |
+| IS_LAN_PRICED_PAIED_251231 | NUMBER(30) | 是否有价宽带缴费截至2025-12-31 |
+| IS_PRICE_LAN_PAIED_2026 | NUMBER(30) | 是否有价宽带缴费2026 1=已缴费, 0=未缴费 |
+| IS_PRICE_LAN_PAIED | NUMBER(30) | 是否有价宽带缴费 |
 
 ### rep2.rep_fact_um_subscriber_yyyymmdd（终端订阅状态表，日分区）
 | 字段名                 | 类型         | 说明                                            |
@@ -337,51 +337,6 @@ FROM (
 | user_status         | VARCHAR2(20) | 用户状态，1=正常,E=正常                  |
 | kpi_own_corp_org_id | VARCHAR2(20) | 归属分公司，3303=无锡                    |
 
-### jour2.om_order_yyyymm（固网订单月表，月分区）
-| 字段名     | 类型         | 说明           |
-| :--------- | :----------- | :------------- |
-| ORDER_ID   | VARCHAR2(20) | 订单号         |
-| BUSI_CODE  | VARCHAR2(20) | 业务操作类型   |
-| DEV_ID     | VARCHAR2(20) | 发展人ID       |
-| CREATE_DATE| VARCHAR2(20) | 订单时间       |
-| op_id      | VARCHAR2(20) | 操作人ID       |
-
-### jour2.om_offer_yyyymm（固网订单产品表，月分区）
-| 字段名     | 类型         | 说明                     |
-| :--------- | :----------- | :----------------------- |
-| ORDER_ID   | VARCHAR2(20) | 订单ID                   |
-| OFFER_ID   | VARCHAR2(20) | 产品ID                   |
-| OFFER_NAME | VARCHAR2(20) | 产品名称                 |
-| CUST_ID    | VARCHAR2(20) | 客户ID                   |
-| ACTION     | VARCHAR2(20) | 操作类型，0=新增         |
-| CREATE_DATE| VARCHAR2(20) | 订单时间                 |
-
-### jour2.om_subscriber_yyyymm（固网订单终端表，月分区）
-| 字段名            | 类型         | 说明                 |
-| :---------------- | :----------- | :------------------- |
-| ORDER_ID          | VARCHAR2(20) | 订单ID               |
-| SUBSCRIBER_INS_ID | VARCHAR2(20) | 终端序列号           |
-| OFFER_INS_ID      | VARCHAR2(20) | 终端关联状态表的ID   |
-
-### params1.sec_operator（操作人表）
-| 字段名      | 类型         | 说明       |
-| :---------- | :----------- | :--------- |
-| OPERATOR_ID | VARCHAR2(20) | 操作人ID   |
-| STAFF_ID    | VARCHAR2(20) | 员工ID     |
-
-### params1.sec_staff（员工表）
-| 字段名       | 类型         | 说明       |
-| :----------- | :----------- | :--------- |
-| STAFF_ID     | VARCHAR2(20) | 员工ID     |
-| STAFF_NAME   | VARCHAR2(20) | 员工姓名   |
-| ORGANIZE_ID  | VARCHAR2(20) | 组织ID     |
-
-### params1.sec_organize（组织表）
-| 字段名              | 类型         | 说明         |
-| :------------------ | :----------- | :----------- |
-| ORGANIZE_ID         | VARCHAR2(20) | 组织ID       |
-| ORGANIZE_NAME       | VARCHAR2(20) | 组织名称     |
-| PARENT_ORGANIZE_ID  | VARCHAR2(20) | 父级组织ID   |
 
 ### files2.um_res（终端物理信息表）
 | 字段名               | 类型          | 说明                     |
@@ -449,3 +404,70 @@ FROM (
 | 字段名       | 类型         | 说明                                    |
 | :----------- | :----------- | :-------------------------------------- |
 | CLIENTID    | VARCHAR2(20) | 终端标识，关联 um_subscriber.BILL_ID    |
+
+### kpi_cust_boss_label_yyyymmdd（用户画像表，日分区，取 t-1）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| AREA | VARCHAR2(255) | 地区 |
+| CORP_ORG_NAME | VARCHAR2(255) | 分公司名称 |
+| CUST_CODE | VARCHAR2(255) | 客户证号 |
+| GENDER | VARCHAR2(2) | 性别 |
+| AGE | VARCHAR2(255) | 年龄 |
+| CUST_ONLINE_YEARS | VARCHAR2(8) | 在网年限 |
+| CUST_OFFLINE_YEARS | VARCHAR2(8) | 离网年限 |
+| IS_PAIED | VARCHAR2(6) | 是否缴费 |
+| SUBSCRIBER_STATE | VARCHAR2(6) | 终端状态 |
+| IDENTITY | VARCHAR2(8) | 身份 |
+| CUST_PROP | VARCHAR2(255) | 客户属性 |
+| RES_COUNT | VARCHAR2(255) | 资源数 |
+| SERVICE_TYPE | VARCHAR2(13) | 业务类型 |
+| IS_FFZZ | CHAR(8) | |
+| ARPU_LEVEL | VARCHAR2(1) | ARPU 等级 |
+| ARPU_TREND | VARCHAR2(255) | ARPU 趋势 |
+| THISYEAR_PAY_COUNT | NUMBER(65) | 今年缴费次数 |
+| LASTYEAR_PAY_COUNT | NUMBER(65) | 去年缴费次数 |
+| PAY_PREFERENCE | VARCHAR2(8) | 缴费偏好 |
+| NEARLY_YEAR_SHUTDOWN_COUNT | VARCHAR2(255) | 近一年停机次数 |
+| STARTUP_DURATION_AVG | VARCHAR2(255) | 平均开机时长 |
+| DTV_MAX_STARTUP_DURATION | VARCHAR2(255) | 电视最大开机时长 |
+| UNPAY_AMOUNT | NUMBER(65) | 欠费金额 |
+| MIN_UNPAY_BILL_MONTH | VARCHAR2(255) | 最早欠费账期 |
+| XL_MARK | VARCHAR2(255) | |
+| AQY_MARK | VARCHAR2(255) | |
+| XB_MARK | VARCHAR2(255) | |
+| SRVPKG_MARK | VARCHAR2(255) | 产品标记 |
+| PREPAY_MARK | CHAR(6) | 预付费标记 |
+| ENTRUST_RELATION | VARCHAR2(100) | 托收关系 |
+| NO_STOPPING | CHAR(1) | 不停机标识 |
+| PARTY_COUNT | VARCHAR2(255) | |
+| CUST_OFFLINE_DAYS | VARCHAR2(255) | 离网天数 |
+| CUST_NAME | VARCHAR2(255) | 客户名称 |
+| CUST_TYPE | NUMBER(10) | 客户类型 |
+| CUST_LEVEL | NUMBER(10) | 客户等级 |
+| CUST_LEVEL_NAME | VARCHAR2(255) | 客户等级名称 |
+| CONT_NUMBER | VARCHAR2(20) | 联系电话 |
+| FAMILY_NUMBER | VARCHAR2(20) | 家庭号码 |
+| CONT_NUMBER2 | VARCHAR2(20) | 联系电话2 |
+| FAMILY_NUMBER2 | VARCHAR2(20) | 家庭号码2 |
+| CORP_ID | VARCHAR2(32) | 分公司 id |
+| CORP_NAME | VARCHAR2(32) | 分公司名称 |
+| STATION_ID | VARCHAR2(64) | 广电站 id |
+| STATION_NAME | VARCHAR2(64) | 广电站名称 |
+| MS_AREA_ID | VARCHAR2(24) | 营销区域 id |
+| MS_AREA_NAM | VARCHAR2(255) | 营销区域名称 |
+| REP_ID | NUMBER(30) | 营业员 id |
+| CITY_NAME | VARCHAR2(255) | 城市名称 |
+| CORP_ORG_ID | NUMBER(30) | 市id 3303='无锡', 3328='江阴', 3330='宜兴' |
+| ADDRESS | VARCHAR2(255) | 地址 |
+| PHONE1 | VARCHAR2(32) | 电话1 |
+| PHONE2 | VARCHAR2(32) | 电话2 |
+| PHONE3 | VARCHAR2(32) | 电话3 |
+| PHONE4 | VARCHAR2(32) | 电话4 |
+| SEGM_ID | CHAR(24) | 分段 id |
+| STAND_NAME | VARCHAR2(255) | 标准名称 |
+| REGION_NAME | VARCHAR2(80) | 区域名称 |
+| FTTH | VARCHAR2(9) | FTTH |
+| PON | VARCHAR2(7) | PON |
+| LAN | VARCHAR2(8) | LAN |
+| CUST_TAG | VARCHAR2(255) | 客户标签 |
+| DT | CHAR(8) | 日期分区 yyyymmdd，取 t-1 |
