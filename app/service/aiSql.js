@@ -1,6 +1,6 @@
-const Service = require('egg').Service;
-const fs = require('fs');
-const path = require('path');
+const Service = require("egg").Service;
+const fs = require("fs");
+const path = require("path");
 
 let TABLE_SCHEMA = null;
 let RULES_CACHE = null;
@@ -9,10 +9,10 @@ let REPORT_CATALOG_TIME = 0;
 
 function loadTableSchema(baseDir) {
 	if (TABLE_SCHEMA) return TABLE_SCHEMA;
-	const skillPath = path.join(baseDir, 'app', 'sql-skill.md');
-	if (!fs.existsSync(skillPath)) return '';
-	const raw = fs.readFileSync(skillPath, 'utf-8');
-	const idx = raw.indexOf('## 表关联关系');
+	const skillPath = path.join(baseDir, "app", "sql-skill.md");
+	if (!fs.existsSync(skillPath)) return "";
+	const raw = fs.readFileSync(skillPath, "utf-8");
+	const idx = raw.indexOf("## 表关联关系");
 	if (idx !== -1) {
 		TABLE_SCHEMA = raw.substring(idx).trim();
 	} else {
@@ -23,9 +23,9 @@ function loadTableSchema(baseDir) {
 
 function loadRulesAndExamples(baseDir) {
 	if (RULES_CACHE) return RULES_CACHE;
-	const rulesPath = path.join(baseDir, 'app', 'skill-rules.json');
+	const rulesPath = path.join(baseDir, "app", "skill-rules.json");
 	if (!fs.existsSync(rulesPath)) return { rules: [], fewShotExamples: [] };
-	RULES_CACHE = JSON.parse(fs.readFileSync(rulesPath, 'utf-8'));
+	RULES_CACHE = JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
 	return RULES_CACHE;
 }
 
@@ -68,7 +68,7 @@ SQL 第一行必须写注释 -- 由AI生成，请人工审核
 class AiSqlService extends Service {
 	async _loadReportCatalog() {
 		const now = Date.now();
-		if (REPORT_CATALOG && (now - REPORT_CATALOG_TIME) < 5 * 60 * 1000) {
+		if (REPORT_CATALOG && now - REPORT_CATALOG_TIME < 5 * 60 * 1000) {
 			return REPORT_CATALOG;
 		}
 		try {
@@ -91,7 +91,7 @@ class AiSqlService extends Service {
 			REPORT_CATALOG_TIME = now;
 			return catalog;
 		} catch (e) {
-			this.app.logger.warn('[aiSql] 加载日报SQL目录失败:', e.message);
+			this.app.logger.warn("[aiSql] 加载日报SQL目录失败:", e.message);
 			return REPORT_CATALOG || {};
 		}
 	}
@@ -100,31 +100,32 @@ class AiSqlService extends Service {
 		const tableSchema = loadTableSchema(this.app.baseDir);
 		const { rules, fewShotExamples } = loadRulesAndExamples(this.app.baseDir);
 
-		let businessRules = '';
+		let businessRules = "";
 		if (rules.length > 0) {
-			businessRules = '\n# 业务口径（重要！）\n';
+			businessRules = "\n# 业务口径（重要！）\n";
 			rules.forEach((r, i) => {
 				businessRules += `${i + 1}. ${r.description}\n`;
-				(r.details || []).forEach(d => {
+				(r.details || []).forEach((d) => {
 					businessRules += `   ${d}\n`;
 				});
 			});
 		}
 
-		let examples = '';
+		let examples = "";
 		if (fewShotExamples.length > 0) {
-			examples = '\n## Few-Shot 示例\n';
-			fewShotExamples.forEach(ex => {
+			examples = "\n## Few-Shot 示例\n";
+			fewShotExamples.forEach((ex) => {
 				examples += `\n**需求**：${ex.requirement}\n\n**返回**：\n\`\`\`sql\n${ex.sql}\n\`\`\`\n`;
 			});
 		}
 
-		let reportCatalog = '';
+		let reportCatalog = "";
 		const catalog = await this._loadReportCatalog();
 		const reportNames = Object.keys(catalog);
 		if (reportNames.length > 0) {
-			reportCatalog = '\n## 当前执行中的日报SQL参考\n';
-			reportCatalog += '当用户提到以下日报名称时，可参考对应SQL。日报SQL中 create table 的表名即固化表名（如 tmp_xxx_$4，$4为日期参数如20260731），可作为查询用的表。\n\n';
+			reportCatalog = "\n## 当前执行中的日报SQL参考\n";
+			reportCatalog +=
+				"当用户提到以下日报名称时，可参考对应SQL。日报SQL中 create table 的表名即固化表名（如 tmp_xxx_$4，$4为日期参数如20260731），可作为查询用的表。\n\n";
 			for (const name of reportNames) {
 				const sqls = catalog[name];
 				const tableNames = [];
@@ -134,7 +135,7 @@ class AiSqlService extends Service {
 				}
 				reportCatalog += `### ${name}\n`;
 				if (tableNames.length > 0) {
-					reportCatalog += `**固化表名**：${tableNames.join(', ')}\n\n`;
+					reportCatalog += `**固化表名**：${tableNames.join(", ")}\n\n`;
 				}
 				for (const sql of sqls) {
 					reportCatalog += `\`\`\`sql\n${sql}\n\`\`\`\n\n`;
@@ -157,7 +158,9 @@ ${examples}
 
 	async _callApi(requirement, attachmentText) {
 		const systemPrompt = await this._buildSystemPrompt();
-		const userMessage = attachmentText ? `${requirement}\n${attachmentText}` : requirement;
+		const userMessage = attachmentText
+			? `${requirement}\n${attachmentText}`
+			: requirement;
 		const { apiKey, baseURL, model, timeout } = this.config.deepseek;
 		const url = `${baseURL}/chat/completions`;
 
@@ -167,16 +170,16 @@ ${examples}
 		let resp;
 		try {
 			resp = await fetch(url, {
-				method: 'POST',
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${apiKey}`,
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${apiKey}`,
 				},
 				body: JSON.stringify({
 					model,
 					messages: [
-						{ role: 'system', content: systemPrompt },
-						{ role: 'user', content: userMessage },
+						{ role: "system", content: systemPrompt },
+						{ role: "user", content: userMessage },
 					],
 					temperature: 0.1,
 					max_tokens: 4096,
@@ -185,8 +188,10 @@ ${examples}
 				signal: controller.signal,
 			});
 		} catch (e) {
-			if (e.name === 'AbortError') {
-				throw new Error(`DeepSeek API 请求超时（${(timeout || 30000) / 1000}秒），请稍后重试`);
+			if (e.name === "AbortError") {
+				throw new Error(
+					`DeepSeek API 请求超时（${(timeout || 30000) / 1000}秒），请稍后重试`,
+				);
 			}
 			throw e;
 		} finally {
@@ -195,7 +200,9 @@ ${examples}
 
 		if (!resp.ok) {
 			const errText = await resp.text();
-			throw new Error(`API返回错误(${resp.status}): ${errText.substring(0, 200)}`);
+			throw new Error(
+				`API返回错误(${resp.status}): ${errText.substring(0, 200)}`,
+			);
 		}
 
 		return resp.body;
@@ -206,7 +213,7 @@ ${examples}
 		const stream = await this._callApi(requirement, attachmentText);
 		const reader = stream.getReader();
 		const decoder = new TextDecoder();
-		let fullContent = '';
+		let fullContent = "";
 
 		try {
 			while (true) {
@@ -214,12 +221,12 @@ ${examples}
 				if (done) break;
 
 				const chunk = decoder.decode(value, { stream: true });
-				const lines = chunk.split('\n');
+				const lines = chunk.split("\n");
 
 				for (const line of lines) {
-					if (line.startsWith('data: ')) {
+					if (line.startsWith("data: ")) {
 						const data = line.slice(6).trim();
-						if (data === '[DONE]') continue;
+						if (data === "[DONE]") continue;
 						try {
 							const parsed = JSON.parse(data);
 							const delta = parsed.choices?.[0]?.delta?.content;
@@ -237,8 +244,8 @@ ${examples}
 		}
 
 		const sql = fullContent
-			.replace(/```sql\s*/gi, '')
-			.replace(/```\s*/g, '')
+			.replace(/```sql\s*/gi, "")
+			.replace(/```\s*/g, "")
 			.trim();
 		return sql;
 	}
@@ -248,7 +255,7 @@ ${examples}
 		const stream = await this._callApi(requirement, attachmentText);
 		const reader = stream.getReader();
 		const decoder = new TextDecoder();
-		let fullContent = '';
+		let fullContent = "";
 
 		try {
 			while (true) {
@@ -256,18 +263,18 @@ ${examples}
 				if (done) break;
 
 				const chunk = decoder.decode(value, { stream: true });
-				const lines = chunk.split('\n');
+				const lines = chunk.split("\n");
 
 				for (const line of lines) {
-					if (line.startsWith('data: ')) {
+					if (line.startsWith("data: ")) {
 						const data = line.slice(6).trim();
-						if (data === '[DONE]') continue;
+						if (data === "[DONE]") continue;
 						try {
 							const parsed = JSON.parse(data);
 							const delta = parsed.choices?.[0]?.delta?.content;
 							if (delta) {
 								fullContent += delta;
-								yield { type: 'chunk', content: delta };
+								yield { type: "chunk", content: delta };
 							}
 						} catch (e) {
 							// 跳过非JSON行
@@ -280,29 +287,30 @@ ${examples}
 		}
 
 		const sql = fullContent
-			.replace(/```sql\s*/gi, '')
-			.replace(/```\s*/g, '')
+			.replace(/```sql\s*/gi, "")
+			.replace(/```\s*/g, "")
 			.trim();
-		yield { type: 'done', sql, prompt: requirement };
+		yield { type: "done", sql, prompt: requirement };
 	}
 
 	async mergeDailyReports(templateHeaders, templateRows, dailyFiles) {
 		let prompt = `你是一个数据处理助手。请将以下多个日报表的数据合并到模板表格式中。
 
 ## 模板表格式
-列名：${templateHeaders.join(', ')}
+列名：${templateHeaders.join(", ")}
 
 样例数据：
 `;
 		for (const row of templateRows.slice(0, 5)) {
-			prompt += row.map(c => c != null ? String(c) : '').join('\t') + '\n';
+			prompt += row.map((c) => (c != null ? String(c) : "")).join("\t") + "\n";
 		}
 
-		prompt += '\n## 日报表数据\n';
+		prompt += "\n## 日报表数据\n";
 		for (const daily of dailyFiles) {
-			prompt += `\n### ${daily.filename}\n列名：${daily.headers.join(', ')}\n数据：\n`;
+			prompt += `\n### ${daily.filename}\n列名：${daily.headers.join(", ")}\n数据：\n`;
 			for (const row of daily.rows) {
-				prompt += row.map(c => c != null ? String(c) : '').join('\t') + '\n';
+				prompt +=
+					row.map((c) => (c != null ? String(c) : "")).join("\t") + "\n";
 			}
 		}
 
@@ -321,16 +329,14 @@ ${examples}
 		const url = `${baseURL}/chat/completions`;
 
 		const resp = await fetch(url, {
-			method: 'POST',
+			method: "POST",
 			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${apiKey}`,
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${apiKey}`,
 			},
 			body: JSON.stringify({
 				model,
-				messages: [
-					{ role: 'user', content: prompt },
-				],
+				messages: [{ role: "user", content: prompt }],
 				temperature: 0.1,
 				max_tokens: 16384,
 				stream: false,
@@ -340,15 +346,82 @@ ${examples}
 
 		if (!resp.ok) {
 			const errText = await resp.text();
-			throw new Error(`API返回错误(${resp.status}): ${errText.substring(0, 200)}`);
+			throw new Error(
+				`API返回错误(${resp.status}): ${errText.substring(0, 200)}`,
+			);
 		}
 
 		const data = await resp.json();
-		const content = data.choices?.[0]?.message?.content || '';
+		const content = data.choices?.[0]?.message?.content || "";
 
 		const jsonMatch = content.match(/\[[\s\S]*\]/);
 		if (!jsonMatch) {
-			throw new Error('AI未返回有效数据，请重试');
+			throw new Error("AI未返回有效数据，请重试");
+		}
+
+		return JSON.parse(jsonMatch[0]);
+	}
+
+	async generateChart(requirement, chartType, excelData) {
+		const { apiKey, baseURL, model, timeout } = this.config.deepseek;
+		const url = `${baseURL}/chat/completions`;
+
+		const dataStr = JSON.stringify(excelData, null, 2);
+
+		const prompt = `你是一个前端图表配置专家。请根据以下信息生成一个 ECharts (v5) 的 option 配置对象。
+
+## 用户原始需求
+${requirement}
+
+## 图表类型
+${chartType}
+
+## 查询结果数据 (JSON数组，每行是一个对象)
+${dataStr}
+
+## 要求
+1. 分析数据，自动识别哪些列适合做 X 轴（类别轴），哪些列适合做 Y 轴（数值轴）
+2. 如果数据有多列数值，使用多系列（series）展示
+3. 金额类数据需要以"元"为单位显示，如果数据是分需除以100
+4. 使用合适的颜色方案
+5. 添加 tooltip 提示框
+6. 添加 legend 图例（如果有多系列）
+7. 如果是柱状图，使用 bar 类型；饼图使用 pie 类型；折线图使用 line 类型
+8. 只返回一个合法的 JSON 对象，不要有任何其他文字，不要用 \`\`\`json 包裹
+9. 不要使用注释
+
+返回格式示例（柱状图）：
+{"tooltip":{"trigger":"axis"},"legend":{"data":["系列1","系列2"]},"xAxis":{"type":"category","data":["类别1","类别2"]},"yAxis":{"type":"value"},"series":[{"name":"系列1","type":"bar","data":[10,20]},{"name":"系列2","type":"bar","data":[15,25]}]}`;
+
+		const resp = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${apiKey}`,
+			},
+			body: JSON.stringify({
+				model,
+				messages: [{ role: "user", content: prompt }],
+				temperature: 0.1,
+				max_tokens: 4096,
+				stream: false,
+			}),
+			signal: AbortSignal.timeout(timeout || 60000),
+		});
+
+		if (!resp.ok) {
+			const errText = await resp.text();
+			throw new Error(
+				`API返回错误(${resp.status}): ${errText.substring(0, 200)}`,
+			);
+		}
+
+		const data = await resp.json();
+		const content = data.choices?.[0]?.message?.content || "";
+
+		const jsonMatch = content.match(/\{[\s\S]*\}/);
+		if (!jsonMatch) {
+			throw new Error("AI未返回有效的图表配置");
 		}
 
 		return JSON.parse(jsonMatch[0]);

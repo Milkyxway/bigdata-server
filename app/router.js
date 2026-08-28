@@ -30,7 +30,6 @@ module.exports = (app) => {
 	router.post("/api/userlist", controller.role.getUsers);
 	router.post("/api/getFsbAccountPwd", controller.role.getFsbAccountPwd);
 	router.post("/api/updateFsbPwd", controller.role.updateFsbPwd);
-	
 
 	router.post("/api/report/list", controller.bigdata.getReportList);
 
@@ -65,6 +64,7 @@ module.exports = (app) => {
 	router.post("/api/report/tasksort", controller.bigdata.taskSort);
 	router.post("/api/report/dailyreport", controller.bigdata.dailyReport);
 	router.post("/api/report/generateSql", controller.bigdata.generateSql);
+	router.post("/api/report/generateChart", controller.bigdata.generateChart);
 	router.post("/api/report/mergeDaily", controller.bigdata.mergeDaily);
 
 	// ==================== Skill 配置管理 ====================
