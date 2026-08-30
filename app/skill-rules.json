@@ -38,15 +38,15 @@
   "fewShotExamples": [
     {
       "requirement": "查询无锡地区昨天新开通的宽带用户数，按广电站分组",
-      "sql": "SELECT t.district_name AS \"广电站\", COUNT(DISTINCT s.subscriber_ins_id) AS \"新增宽带用户数\"\nFROM rep2.rep_fact_ins_srvpkg_20260811 t\nJOIN files2.um_subscriber s ON t.subscriber_ins_id = s.subscriber_ins_id\nWHERE t.prod_service_id = '1004'\n  AND t.srvpkg_state = '1'\n  AND t.srvpkg_os_status IS NULL\n  AND s.corp_org_id = '3303'\n  AND t.create_date >= TO_CHAR(TRUNC(SYSDATE)-1, 'YYYYMMDD')\n  AND t.create_date < TO_CHAR(TRUNC(SYSDATE), 'YYYYMMDD')\nGROUP BY t.district_name"
+      "sql": "SELECT t.district_name AS \"广电站\", COUNT(DISTINCT s.subscriber_ins_id) AS \"新增宽带用户数\"\nFROM rep2.rep_fact_ins_srvpkg_yyyymmdd t\nJOIN files2.um_subscriber s ON t.subscriber_ins_id = s.subscriber_ins_id\nWHERE t.prod_service_id = '1004'\n  AND t.srvpkg_state = '1'\n  AND t.srvpkg_os_status IS NULL\n  AND s.corp_org_id = '3303'\n  AND t.create_date >= TO_CHAR(TRUNC(SYSDATE)-1, 'YYYYMMDD')\n  AND t.create_date < TO_CHAR(TRUNC(SYSDATE), 'YYYYMMDD')\nGROUP BY t.district_name"
     },
     {
       "requirement": "查询本月各业务类型的订购量",
-      "sql": "SELECT CASE PROD_SERVICE_ID WHEN '1002' THEN '电视' WHEN '1003' THEN '互动' WHEN '1004' THEN '宽带' WHEN '1005' THEN '付费节目' WHEN '1006' THEN '互动点播' WHEN '1008' THEN '增值业务' ELSE '未知' END AS \"业务类型\", COUNT(*) AS \"订购量\"\nFROM rep2.rep_fact_ins_srvpkg_20260811\nWHERE srvpkg_state = '1'\n  AND srvpkg_os_status IS NULL\n  AND create_date >= TO_CHAR(TRUNC(SYSDATE, 'MM'), 'YYYYMMDD')\nGROUP BY PROD_SERVICE_ID"
+      "sql": "SELECT CASE PROD_SERVICE_ID WHEN '1002' THEN '电视' WHEN '1003' THEN '互动' WHEN '1004' THEN '宽带' WHEN '1005' THEN '付费节目' WHEN '1006' THEN '互动点播' WHEN '1008' THEN '增值业务' ELSE '未知' END AS \"业务类型\", COUNT(*) AS \"订购量\"\nFROM rep2.rep_fact_ins_srvpkg_yyyymmdd\nWHERE srvpkg_state = '1'\n  AND srvpkg_os_status IS NULL\n  AND create_date >= TO_CHAR(TRUNC(SYSDATE, 'MM'), 'YYYYMMDD')\nGROUP BY PROD_SERVICE_ID"
     },
     {
       "requirement": "查询当前所有欠费客户的欠费总额",
-      "sql": "SELECT c.cust_code AS \"客户证号\", c.cust_id AS \"客户ID\", SUM(ROUND(NVL(u.fee, 0)/100, 2)) AS \"欠费总额(元)\"\nFROM rep2.rep_fact_unpay_20260811 u\nJOIN files2.cm_account a ON u.acct_id = a.acct_id\nJOIN rep2.rep_fact_cust_info_20260811 c ON a.cust_id = c.cust_id\nGROUP BY c.cust_code, c.cust_id\nORDER BY SUM(ROUND(NVL(u.fee, 0)/100, 2)) DESC"
+      "sql": "SELECT c.cust_code AS \"客户证号\", c.cust_id AS \"客户ID\", SUM(ROUND(NVL(u.fee, 0)/100, 2)) AS \"欠费总额(元)\"\nFROM rep2.rep_fact_unpay_yyyymmdd u\nJOIN files2.cm_account a ON u.acct_id = a.acct_id\nJOIN rep2.rep_fact_cust_info_yyyymmdd c ON a.cust_id = c.cust_id\nGROUP BY c.cust_code, c.cust_id\nORDER BY SUM(ROUND(NVL(u.fee, 0)/100, 2)) DESC"
     },
     {
       "requirement": "查询cust_code为'xxxx'的客户在2025年1月到2026年8月的点播记录明细",

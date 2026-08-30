@@ -342,6 +342,51 @@ class BigDataController extends Controller {
 		}
 	}
 
+	async generateChartFromExcel() {
+		const { ctx, service } = this;
+		const { requirement, prompt } = ctx.request.body;
+		const query = requirement || prompt;
+		if (!query) {
+			return ctx.sendError("请输入需求描述");
+		}
+
+		const files = ctx.request.files;
+		if (!files || files.length === 0) {
+			return ctx.sendError("请上传Excel文件");
+		}
+
+		try {
+			const XLSX = require("xlsx");
+			const file = files[0];
+			const workbook = XLSX.readFile(file.filepath);
+			const sheetName = workbook.SheetNames[0];
+			const sheet = workbook.Sheets[sheetName];
+			const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+			if (!jsonData || jsonData.length === 0) {
+				return ctx.sendError("Excel 文件中没有数据");
+			}
+
+			let chartType = "bar";
+			if (/饼图|饼状图/.test(query)) {
+				chartType = "pie";
+			} else if (/折线图|趋势图/.test(query)) {
+				chartType = "line";
+			} else if (/柱状图|柱形图|条形图/.test(query)) {
+				chartType = "bar";
+			}
+
+			const chartOption = await service.aiSql.generateChart(
+				query,
+				chartType,
+				jsonData,
+			);
+			return ctx.sendSuccess({ chartOption });
+		} catch (e) {
+			return ctx.sendError(e.message || "生成图表失败");
+		}
+	}
+
 	async mergeDaily() {
 		const { ctx, service } = this;
 		const files = ctx.request.files;

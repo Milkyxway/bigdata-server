@@ -67,6 +67,9 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | rep.fin2_received_fee_dev_yyyymm | DEV_ID            | params1.sec_developer              | DEV_ID            | 1:1  | 发票对应发展人         |
 | dwd.dwd_all_movie_detail_yyyymm   | CLIENT_ID         | files2.um_subscriber               | BILL_ID           | N:1  | 点播记录对应终端       |
 | cp2.cm_customer                   | CUST_ID           | files2.um_subscriber               | CUST_ID           | 1:1  | 客户主表对应终端       |
+| rep.DWA_CRM_KD_BEHAVIOR_yyyymmdd  | PROD_INST_ID      | rep.DWA_KD_BEHAVIOR_UPDATE_yyyymmdd| SUBSCRIBER_INS_ID | 1:1  | UNION合并为完整宽带行为记录，序列号关联终端 |
+| 宽带行为记录(UNION)               | 序列号(PROD_INST_ID/SUBSCRIBER_INS_ID) | files2.um_subscriber          | SUBSCRIBER_INS_ID | 1:1  | 宽带行为关联终端       |
+| 宽带行为记录(UNION)               | 序列号(PROD_INST_ID/SUBSCRIBER_INS_ID) | rep.rep_fact_lan_cust_new_yyyymmdd | SUBSCRIBER_INS_ID | 1:1  | 宽带行为关联有价宽带 |
 
 ## 表结构
 
@@ -471,3 +474,88 @@ FROM (
 | LAN | VARCHAR2(8) | LAN |
 | CUST_TAG | VARCHAR2(255) | 客户标签 |
 | DT | CHAR(8) | 日期分区 yyyymmdd，取 t-1 |
+
+### DWA_KD_BEHAVIOR_UPDATE_YYYYMMDD（宽带使用记录表，日分区，取 t-4）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| AREA_ID | NUMBER(16) | 区域ID |
+| AREA | VARCHAR2(254) | 区域 |
+| CORP_ORG_ID | NUMBER(32) | 公司ID |
+| CORP_ORG_NAME | VARCHAR2(254) | 公司名称 |
+| CUST_CODE | VARCHAR2(254) | 客户证号 |
+| SUBSCRIBER_INS_ID | NUMBER(32) | 终端实例ID |
+| USER_NAME | VARCHAR2(254) | 用户名 |
+| ONLINE_DAYS | NUMBER(32) | 在线天数 |
+| RES_EQU_NO | VARCHAR2(254) | 设备编号 |
+| OFFER_ID | NUMBER(32) | 套餐ID |
+| CREATE_DATE | VARCHAR2(254) | 创建时间 |
+| DONE_DATE | VARCHAR2(254) | 完成时间 |
+| CMMAC | VARCHAR2(254) | MAC地址 |
+| START_TIME | VARCHAR2(254) | 开始时间 |
+| STOP_TIME | VARCHAR2(254) | 结束时间 |
+| ONLINE_DURATION | VARCHAR2(254) | 在线时长 |
+| UPDATE_TIME | VARCHAR2(254) | 更新时间 |
+| BRAS_INPUT_OCTETS | VARCHAR2(254) | 上行流量(字节) |
+| BRAS_OUTPUT_OCTETS | VARCHAR2(254) | 下行流量(字节) |
+| BOSS_TYPE | VARCHAR2(254) | BOSS类型 |
+| ETL_TIME | VARCHAR2(254) | ETL时间 |
+| DT | VARCHAR2(32) | 日期分区 yyyymmdd，取 t-4 |
+
+### rep.DWA_CRM_KD_BEHAVIOR_YYYYMMDD（宽带使用记录表，日分区，取 t-4）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| AREA_ID | NUMBER(30) | 区域ID |
+| AREA | VARCHAR2(255) | 区域 |
+| CORP_ORG_ID | NUMBER(30) | 公司ID |
+| CORP_ORG_NAME | VARCHAR2(255) | 公司名称 |
+| CUST_CODE | VARCHAR2(255) | 客户证号 |
+| PROD_INST_ID | NUMBER(30) | 产品实例ID |
+| LOGIN_NAME | VARCHAR2(255) | 登录名 |
+| RES_EQU_NO | VARCHAR2(255) | 设备编号 |
+| SRVPKG_ID | NUMBER(30) | 套餐ID |
+| CREATE_DATE | VARCHAR2(255) | 创建时间 |
+| DONE_DATE | VARCHAR2(255) | 完成时间 |
+| CMMAC | VARCHAR2(255) | MAC地址 |
+| FIRST_TIME | VARCHAR2(255) | 首次时间 |
+| LAST_TIME | VARCHAR2(255) | 最后时间 |
+| PLAY_NUM | NUMBER(30) | 播放次数 |
+| PLAY_DURATION | NUMBER(30) | 播放时长 |
+| INPUT_OCTETS | NUMBER(30) | 上行流量(字节) |
+| OUTPUT_OCTETS | NUMBER(30) | 下行流量(字节) |
+| AREA_TYPE | VARCHAR2(8) | 区域类型 |
+| BOSS_TYPE | VARCHAR2(8) | BOSS类型 |
+| ETL_TIME | VARCHAR2(32) | ETL时间 |
+| DT | VARCHAR2(16) | 日期分区 yyyymmdd，取 t-4 |
+
+### rep.rep_fact_lan_cust_new_yyyymmdd（有价宽带表，日分区，最小颗粒到终端 subscriber_ins_id）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| CORP_ORG_ID | NUMBER(30) | 公司ID |
+| CUST_CODE | VARCHAR2(255) | 客户证号 |
+| CUST_ID | NUMBER(30) | 客户ID |
+| DTV_COUNT | NUMBER(10) | 电视数量 |
+| IS_PAIED | NUMBER(10) | 是否缴费 |
+| IS_VALID1 | NUMBER(10) | 是否有效 |
+| LAN_PAIED_COUNT | NUMBER(10) | 宽带缴费数量 |
+| IS_LAN_VALID | NUMBER(30) | 宽带是否有效 |
+| IS_LAN_PAIED | NUMBER(30) | 宽带是否缴费 |
+| SUBSCRIBER_INS_ID | NUMBER(30) | 终端实例ID |
+| MAIN_SPEC_ID | NUMBER(30) | 主规格ID |
+| BILL_ID | VARCHAR2(255) | 账单ID |
+| SUB_BILL_ID | VARCHAR2(255) | 子账单ID |
+| LOGIN_NAME | VARCHAR2(255) | 登录名 |
+| OFFER_ID | NUMBER(16) | 套餐ID |
+| OFFER_NAME | VARCHAR2(128) | 套餐名称 |
+| BANDWIDTH | NUMBER(30) | 带宽 |
+| OFFER_PRICE | VARCHAR2(500) | 套餐价格 |
+| PRICE_END | NUMBER(30) | 价格截止 |
+| PRICE_TYPE | VARCHAR2(11) | 价格类型 |
+| OFFER_ITEM_CODE | NUMBER(9) | 套餐项编码 |
+| OFFER_VALID_DATE | DATE | 套餐生效日期 |
+| OFFER_EXPIRE_DATE | DATE | 套餐失效日期 |
+| OFFER_CREATE_DATE | DATE | 套餐创建日期 |
+| OFFER_DONE_DATE | DATE | 套餐完成日期 |
+| IS_LAN_PRICED_PAIED_241231 | NUMBER(30) | 截至241231有价宽带缴费标识 |
+| IS_LAN_PRICED_PAIED_251231 | NUMBER(30) | 截至251231有价宽带缴费标识 |
+| IS_PRICE_LAN_PAIED_2026 | NUMBER(30) | 有价宽带缴费标识（2026年） |
+| IS_PRICE_LAN_PAIED | NUMBER(30) | 有价宽带缴费标识 |

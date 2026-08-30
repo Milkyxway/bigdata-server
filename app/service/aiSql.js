@@ -4,8 +4,6 @@ const path = require("path");
 
 let TABLE_SCHEMA = null;
 let RULES_CACHE = null;
-let REPORT_CATALOG = null;
-let REPORT_CATALOG_TIME = 0;
 
 function loadTableSchema(baseDir) {
 	if (TABLE_SCHEMA) return TABLE_SCHEMA;
@@ -32,8 +30,6 @@ function loadRulesAndExamples(baseDir) {
 function reloadAll() {
 	TABLE_SCHEMA = null;
 	RULES_CACHE = null;
-	REPORT_CATALOG = null;
-	REPORT_CATALOG_TIME = 0;
 }
 
 const STATIC_RULES = `
@@ -43,21 +39,55 @@ const STATIC_RULES = `
 3. 结果可读：列名使用中文别名（双引号包裹），金额/小数格式化
 
 # SQL 书写铁律（必须遵守）
-1. 严禁 SELECT *，必须显式列出字段。但如果用户需求中明确提到"所有字段"或"全部字段"，则使用 SELECT *
-2. 时间过滤：WHERE 条件中涉及时间的，必须命中索引字段，格式为：
+1. 严禁臆想字段：SQL 中用到的所有字段名必须来自表结构定义，不得自行编造字段名
+2. 严禁 SELECT *，必须显式列出字段。但如果用户需求中明确提到"所有字段"或"全部字段"，则使用 SELECT *
+3. 时间过滤：WHERE 条件中涉及时间的，必须命中索引字段，格式为：
    - 今日：COLUMN >= TRUNC(SYSDATE)
    - 昨日：COLUMN >= TRUNC(SYSDATE)-1 AND COLUMN < TRUNC(SYSDATE)
-3. NULL 处理：数值计算（SUM/AVG）前必须用 NVL(COLUMN, 0) 包裹
-4. 模糊查询：使用 LIKE，默认区分大小写，如需忽略大小写使用 UPPER()/LOWER()
+4. NULL 处理：数值计算（SUM/AVG）前必须用 NVL(COLUMN, 0) 包裹
+5. 模糊查询：使用 LIKE，默认区分大小写，如需忽略大小写使用 UPPER()/LOWER()
+6. 严禁使用 WITH 语句（CTE），必须用子查询或临时表替代
 
 # 金额处理
 - 所有金额字段以分为单位，必须 /100 并保留两位小数：ROUND(NVL(AMOUNT, 0)/100, 2) AS "金额"
 
 # 分区表处理（关键！）
-1. 日分区表（以 yyyymmdd 结尾）：一般取 T-1 的日期，表名格式：表名_YYYYMMDD
-   - 例如：今天是 2026-08-12，则表名为 rep2.rep_fact_ins_srvpkg_20260811
+1. 日分区表（以 yyyymmdd 结尾）：大多数表取 T-1 日期，即 TRUNC(SYSDATE)-1
+   - 表名计算方式：TO_CHAR(TRUNC(SYSDATE)-1, 'YYYYMMDD')
+   - 特例：DWA_KD_BEHAVIOR_UPDATE、DWA_CRM_KD_BEHAVIOR（宽带使用记录表）取 T-4，即 TRUNC(SYSDATE)-4
+   - 如果今天是 2026-08-21，则 T-1 为 20260820，T-4 为 20260817
+   - 严禁硬编码日期，必须根据当前日期和表规则动态计算
 2. 月分区表（以 yyyymm 结尾）：必须拼接 2026 年以来所有月份 UNION ALL
    - 例如：rep2.rep_fact_payoff_consume_detail_202601 UNION ALL ... UNION ALL rep2.rep_fact_payoff_consume_detail_202608
+
+# 包年宽带周报表名映射（重要！）
+当用户提到以下日报名称时，使用对应的固化表名，$4 替换为 T-1 的 yyyymmdd：
+| 用户提到的名称 | 固化表名 |
+| 包年宽带到期周报 | tmp_bnkddqzb_$4 |
+| 包年宽带续订周报 | tmp_bnkdxdzb_$4 |
+| 江阴包年宽带到期周报 | tmp_bnkddqzb_jy_$4 |
+| 江阴包年宽带续订周报 | tmp_bnkdxdzb_jy_$4 |
+| 宜兴包年宽带到期周报 | tmp_bnkddqzb_yx_$4 |
+| 宜兴包年宽带续订周报 | tmp_bnkdxdzb_yx_$4 |
+
+# 宽带行为记录查询（重要！）
+宽带行为记录由两张表 UNION 合并组成完整数据：
+1. rep.DWA_CRM_KD_BEHAVIOR_yyyymmdd：序列号字段为 PROD_INST_ID，时长字段为 PLAY_DURATION
+2. rep.DWA_KD_BEHAVIOR_UPDATE_yyyymmdd：序列号字段为 SUBSCRIBER_INS_ID，时长字段为 ONLINE_DURATION
+查询宽带行为时，必须 UNION 这两张表，序列号统一别名为"序列号"后可与 files2.um_subscriber.SUBSCRIBER_INS_ID 关联终端信息。
+宽带活跃定义：UNION 后的时长字段 >= 10800（即 3 小时）为活跃。
+UNION 模板：
+SELECT DISTINCT be.cust_code, be.prod_inst_id AS 序列号, be.play_duration AS 时长, 'CRM' AS 来源
+FROM rep.DWA_CRM_KD_BEHAVIOR_yyyymmdd be
+UNION
+SELECT DISTINCT be2.cust_code, be2.subscriber_ins_id AS 序列号, be2.online_duration AS 时长, 'UPDATE' AS 来源
+FROM rep.DWA_KD_BEHAVIOR_UPDATE_yyyymmdd be2
+
+# 图表生成（重要！）
+当用户需求中提到"生成图表"、"生成柱状图"、"生成饼状图"、"生成折线图"、"画图"、"可视化"等关键词时：
+1. 说明用户需要图表展示，系统会自动触发图表生成流程（ECharts渲染），你只需正常生成SQL即可
+2. SQL 查询结果应包含至少一个类别列（X轴）和至少一个数值列（Y轴），便于后续图表渲染
+3. 列名使用中文别名，图表生成时会自动识别为坐标轴名称
 
 # 输出格式
 只输出完整的 Oracle SQL 语句（不含分号），不要输出任何解释说明。
@@ -66,36 +96,6 @@ SQL 第一行必须写注释 -- 由AI生成，请人工审核
 用 \`\`\`sql 代码块包裹。`;
 
 class AiSqlService extends Service {
-	async _loadReportCatalog() {
-		const now = Date.now();
-		if (REPORT_CATALOG && now - REPORT_CATALOG_TIME < 5 * 60 * 1000) {
-			return REPORT_CATALOG;
-		}
-		try {
-			const sql = `SELECT rl.reportId, rl.reportName, rs.reportSqlData
-				FROM report_list rl
-				LEFT JOIN report_type rt ON rl.reportTypeId = rt.reportTypeId
-				LEFT JOIN report_sql rs ON rl.reportId = rs.reportId
-				WHERE rl.reportState = 1 AND rt.reportTypeName = '日报'
-				ORDER BY rl.reportId, rs.reportSqlId`;
-			const rows = await this.app.mysql.query(sql);
-			const catalog = {};
-			for (const row of rows) {
-				if (!row.reportName || !row.reportSqlData) continue;
-				if (!catalog[row.reportName]) {
-					catalog[row.reportName] = [];
-				}
-				catalog[row.reportName].push(row.reportSqlData);
-			}
-			REPORT_CATALOG = catalog;
-			REPORT_CATALOG_TIME = now;
-			return catalog;
-		} catch (e) {
-			this.app.logger.warn("[aiSql] 加载日报SQL目录失败:", e.message);
-			return REPORT_CATALOG || {};
-		}
-	}
-
 	async _buildSystemPrompt() {
 		const tableSchema = loadTableSchema(this.app.baseDir);
 		const { rules, fewShotExamples } = loadRulesAndExamples(this.app.baseDir);
@@ -119,30 +119,6 @@ class AiSqlService extends Service {
 			});
 		}
 
-		let reportCatalog = "";
-		const catalog = await this._loadReportCatalog();
-		const reportNames = Object.keys(catalog);
-		if (reportNames.length > 0) {
-			reportCatalog = "\n## 当前执行中的日报SQL参考\n";
-			reportCatalog +=
-				"当用户提到以下日报名称时，可参考对应SQL。日报SQL中 create table 的表名即固化表名（如 tmp_xxx_$4，$4为日期参数如20260731），可作为查询用的表。\n\n";
-			for (const name of reportNames) {
-				const sqls = catalog[name];
-				const tableNames = [];
-				for (const sql of sqls) {
-					const match = sql.match(/create\s+table\s+(\S+)\s/i);
-					if (match) tableNames.push(match[1]);
-				}
-				reportCatalog += `### ${name}\n`;
-				if (tableNames.length > 0) {
-					reportCatalog += `**固化表名**：${tableNames.join(", ")}\n\n`;
-				}
-				for (const sql of sqls) {
-					reportCatalog += `\`\`\`sql\n${sql}\n\`\`\`\n\n`;
-				}
-			}
-		}
-
 		return `你是一名拥有 10 年经验的 Oracle 数据库开发专家，擅长 OLTP 系统的 Ad-hoc 查询（提数）和报表统计。
 根据用户需求编写高效、准确的 Oracle SQL（支持 11g/12c/19c），适用于 PL/SQL Developer 直接执行。
 
@@ -150,8 +126,9 @@ ${tableSchema}
 
 ${STATIC_RULES}
 ${businessRules}
-${reportCatalog}
 ${examples}
+
+注意：当前日期是 ${new Date().toISOString().slice(0, 10)}，请基于此日期计算 T-1 分区表名。
 
 现在请根据以下用户需求生成SQL：`;
 	}
@@ -366,32 +343,63 @@ ${examples}
 		const { apiKey, baseURL, model, timeout } = this.config.deepseek;
 		const url = `${baseURL}/chat/completions`;
 
-		const dataStr = JSON.stringify(excelData, null, 2);
+		const sampleData = excelData.slice(0, 50);
+		const dataStr = JSON.stringify(sampleData, null, 2);
+		const totalRows = excelData.length;
+		const columns = excelData.length > 0 ? Object.keys(excelData[0]) : [];
 
-		const prompt = `你是一个前端图表配置专家。请根据以下信息生成一个 ECharts (v5) 的 option 配置对象。
+		const prompt = `你是一个数据分析与图表配置专家。请根据用户需求和查询结果数据，智能生成一个 ECharts (v5) 的 option 配置对象。
 
-## 用户原始需求
+## 用户需求
 ${requirement}
 
-## 图表类型
-${chartType}
+## 数据概览
+- 总行数：${totalRows}（前端渲染时使用全部数据，这里仅展示前50行用于分析）
+- 列名：${columns.join(', ')}
+- 图表类型偏好：${chartType}
 
-## 查询结果数据 (JSON数组，每行是一个对象)
+## 数据样本 (前50行)
 ${dataStr}
 
-## 要求
-1. 分析数据，自动识别哪些列适合做 X 轴（类别轴），哪些列适合做 Y 轴（数值轴）
-2. 如果数据有多列数值，使用多系列（series）展示
-3. 金额类数据需要以"元"为单位显示，如果数据是分需除以100
-4. 使用合适的颜色方案
-5. 添加 tooltip 提示框
-6. 添加 legend 图例（如果有多系列）
-7. 如果是柱状图，使用 bar 类型；饼图使用 pie 类型；折线图使用 line 类型
-8. 只返回一个合法的 JSON 对象，不要有任何其他文字，不要用 \`\`\`json 包裹
-9. 不要使用注释
+## 分析步骤（请在脑中完成，不要输出）
+### 第一步：分析数据结构
+1. 识别每列的数据类型：文本/类别列、数值列、日期列
+2. 统计每列的去重值数量，判断哪些列适合做 X 轴（类别列去重数少、有规律）
+3. 找出所有数值列（int/float 类型），这些是 Y 轴候选
 
-返回格式示例（柱状图）：
-{"tooltip":{"trigger":"axis"},"legend":{"data":["系列1","系列2"]},"xAxis":{"type":"category","data":["类别1","类别2"]},"yAxis":{"type":"value"},"series":[{"name":"系列1","type":"bar","data":[10,20]},{"name":"系列2","type":"bar","data":[15,25]}]}`;
+### 第二步：决定图表策略
+1. 如果用户只说"柱状图"但数据有多个数值列 → 自动创建多系列柱状图对比（如"销售额"和"利润"并列展示）
+2. 如果数据有日期列 → 用日期列做 X 轴，适合折线图展示趋势
+3. 如果只有一个类别列 + 一个数值列，且类别数 ≤ 8 → 饼图更直观
+4. 如果有"分组"含义的列（如"地区"、"月份"、"业务类型"）+ 多个数值列 → 多系列柱状图/折线图
+5. 如果列名含有"对比"、"同比"、"环比"、"增长率"等 → 必须用多系列展示
+
+### 第三步：智能格式化
+1. 列名含"金额/费用/收入/欠费/提成/amount/fee/price" → 数值可能以分为单位，除以100，加"元"后缀
+2. 列名含"率/比例/占比/percent/rate/ratio" → 加"%"后缀
+3. 列名含"数/量/户/个/笔/count" → 整数格式，不加后缀
+4. 数值过大（>10000）→ 用万/亿单位或逗号分隔
+
+## 配色方案
+使用以下清新的配色（按顺序循环使用）：
+['#5470C6', '#91CC75', '#FAC858', '#EE6666', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4']
+
+## 图表配置要求
+1. tooltip: 必须启用，trigger 柱状/折线图用 'axis'，饼图用 'item'，格式化显示数值和单位
+2. legend: 多系列时必须显示，单系列可省略
+3. grid: 留出合理边距 {left:'3%', right:'4%', bottom:'15%', top:'15%', containLabel:true}
+4. xAxis: 如果标签文字过长（>5个字），设置 axisLabel.rotate: 30
+5. yAxis: 数值轴，设置 name 为数值单位（如"元"、"户"等）
+6. 饼图特有：使用 radius: ['40%', '70%'] 做环形饼图，label 显示名称+百分比
+7. 如果数据行数 > 20，添加 dataZoom: [{type: 'slider', start: 0, end: 100}] 支持滚动
+8. 柱状图柱宽自适应，不要挤在一起
+9. 所有文本颜色使用 #333，保证可读性
+
+## 输出要求
+只返回一个合法的 JSON 对象，不要有任何其他文字，不要用 \`\`\`json 包裹，不要注释。
+
+示例（两柱对比柱状图）：
+{"tooltip":{"trigger":"axis","axisPointer":{"type":"shadow"}},"legend":{"data":["新增用户","活跃用户"]},"grid":{"left":"3%","right":"4%","bottom":"15%","containLabel":true},"xAxis":{"type":"category","data":["无锡","苏州","常州"],"axisLabel":{"rotate":0}},"yAxis":{"type":"value","name":"用户数"},"color":["#5470C6","#91CC75"],"series":[{"name":"新增用户","type":"bar","data":[1200,980,650]},{"name":"活跃用户","type":"bar","data":[8500,7200,5100]}]}`;
 
 		const resp = await fetch(url, {
 			method: "POST",

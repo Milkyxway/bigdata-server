@@ -65,6 +65,7 @@ module.exports = (app) => {
 	router.post("/api/report/dailyreport", controller.bigdata.dailyReport);
 	router.post("/api/report/generateSql", controller.bigdata.generateSql);
 	router.post("/api/report/generateChart", controller.bigdata.generateChart);
+	router.post("/api/report/generateChartFromExcel", controller.bigdata.generateChartFromExcel);
 	router.post("/api/report/mergeDaily", controller.bigdata.mergeDaily);
 
 	// ==================== Skill 配置管理 ====================
