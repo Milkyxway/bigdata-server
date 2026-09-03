@@ -363,6 +363,33 @@ FROM (
 | REGION_ID            | VARCHAR2(6)   | 区域ID                   |
 | REMARKS              | VARCHAR2(512) | 备注                     |
 
+### files2.um_subscriber（终端用户信息表）
+| 字段名               | 类型          | 说明                     |
+| :------------------- | :------------ | :----------------------- |
+| SUBSCRIBER_INS_ID    | NUMBER(16)    | 用户实例标识（主键）     |
+| CUST_ID              | NUMBER(16)    | 客户标识                 |
+| ACCESS_NUM           | VARCHAR2(32)  | 接入号                   |
+| BILL_ID              | VARCHAR2(120) | 机顶盒号                 |
+| SUB_BILL_ID          | VARCHAR2(50)  | 卡号（次计费号）         |
+| USER_NAME            | VARCHAR2(255) | 用户名                   |
+| LOGIN_NAME           | VARCHAR2(64)  | 宽带账号名               |
+| SUBSCRIBER_TYPE      | VARCHAR2(6)   | 用户类型                 |
+| STATE                | VARCHAR2(3)   | 用户状态：1=正常,M=停机,C=预销,D=注销 |
+| OS_STATUS            | VARCHAR2(1000)| 停开机状态               |
+| OPEN_DATE            | DATE          | 开户时间                 |
+| FIRST_ACTIVE_DATE    | DATE          | 首次激活时间             |
+| REMOVE_TAG           | VARCHAR2(8)   | 注销标志：0=正常,1=主动预销,2=主动销号,3=欠费预销,4=欠费销号 |
+| DESTORY_DATE         | DATE          | 销户时间                 |
+| REGION_ID            | VARCHAR2(6)   | 数据归属地区             |
+| CORP_ORG_ID          | NUMBER(12)    | 操作员归属分公司         |
+| OWN_CORP_ORG_ID      | NUMBER(12)    | 客户归属分公司           |
+| VALID_DATE           | DATE          | 生效日期                 |
+| EXPIRE_DATE          | DATE          | 失效日期                 |
+| CREATE_DATE          | DATE          | 创建日期                 |
+| AREA_CODE            | VARCHAR2(40)  | 区号                     |
+| DEVELOP_ORG_ID       | NUMBER(12)    | 发展渠道                 |
+| NET_TYPE_CODE        | VARCHAR2(2)   | 网别编码                 |
+
 ### rep.fin2_received_fee_dev_yyyymm（发展人实收发票明细表，月分区）
 | 字段名               | 类型          | 说明                     |
 | :------------------- | :------------ | :----------------------- |

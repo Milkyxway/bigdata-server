@@ -47,6 +47,8 @@ const STATIC_RULES = `
 4. NULL 处理：数值计算（SUM/AVG）前必须用 NVL(COLUMN, 0) 包裹
 5. 模糊查询：使用 LIKE，默认区分大小写，如需忽略大小写使用 UPPER()/LOWER()
 6. 严禁使用 WITH 语句（CTE），必须用子查询或临时表替代
+7. 查询 files2.um_subscriber 表时，必须加条件 EXPIRE_DATE > SYSDATE，过滤已失效终端
+8. 查询终端明细时，取 um_subscriber 表的以下字段：BILL_ID（机顶盒号）、SUBSCRIBER_INS_ID、LOGIN_NAME（宽带账号名）、EXPIRE_DATE、SUBSCRIBER_TYPE（1=电视,3=宽带，需用 CASE WHEN 转中文）、SUB_BILL_ID（卡号）
 
 # 金额处理
 - 所有金额字段以分为单位，必须 /100 并保留两位小数：ROUND(NVL(AMOUNT, 0)/100, 2) AS "金额"
@@ -69,6 +71,7 @@ const STATIC_RULES = `
 | 江阴包年宽带续订周报 | tmp_bnkdxdzb_jy_$4 |
 | 宜兴包年宽带到期周报 | tmp_bnkddqzb_yx_$4 |
 | 宜兴包年宽带续订周报 | tmp_bnkdxdzb_yx_$4 |
+| 江阴宜兴本年包年宽带订购明细 | tmp_jyyx_dgzc_$4 |
 
 # 宽带行为记录查询（重要！）
 宽带行为记录由两张表 UNION 合并组成完整数据：
@@ -82,6 +85,45 @@ FROM rep.DWA_CRM_KD_BEHAVIOR_yyyymmdd be
 UNION
 SELECT DISTINCT be2.cust_code, be2.subscriber_ins_id AS 序列号, be2.online_duration AS 时长, 'UPDATE' AS 来源
 FROM rep.DWA_KD_BEHAVIOR_UPDATE_yyyymmdd be2
+
+# 移网/5G表统计口径（重要！）
+表名：repcx.rep_fact_yw_um_subscriber_info_yyyymmdd（日分区，取 T-1 日期）
+所有统计指标均对 user_id 去重：
+| 指标 | 条件 | SQL 写法 |
+| 在网数 | onnet_status = '1' | COUNT(DISTINCT user_id) |
+| 活跃数 | is_30d_active_2023 = '1' | COUNT(DISTINCT user_id) |
+| 开通数 | user_status IN ('1', 'E') | COUNT(DISTINCT user_id) |
+
+# 移网/5G出账金额分站查询（重要！）
+涉及两张表关联：
+1. repcx.rep_fact_yw_um_subscriber_info_$a4：移网/5G终端信息表，$a4 = 上月底最后一天（yyyymmdd），计算方式：TO_CHAR(LAST_DAY(ADD_MONTHS(SYSDATE, -1)), 'YYYYMMDD')
+2. repcx.ADS_ITEM_USER_BILL_M_$1：出账金额表（月分区），$1 = 上月（yyyymm），计算方式：TO_CHAR(ADD_MONTHS(SYSDATE, -1), 'YYYYMM')
+关联方式：yw.user_id(+) = aiub.user_id（移网表右连接出账表）
+主副卡判断：pri_card_id IS NULL 为主卡，IS NOT NULL 为副卡
+出账金额字段：fact
+无锡过滤：corp_org_id = 3303
+
+查询模板（出账金额）：
+SELECT yw.department_name AS "广电站",
+       SUM(CASE WHEN aiub.pri_card_id IS NULL THEN aiub.fact END) AS "主卡出账金额",
+       SUM(CASE WHEN aiub.pri_card_id IS NOT NULL THEN aiub.fact END) AS "副卡出账金额"
+FROM repcx.ADS_ITEM_USER_BILL_M_$1 aiub,
+     repcx.rep_fact_yw_um_subscriber_info_$a4 yw
+WHERE yw.user_id(+) = aiub.user_id
+  AND aiub.corp_org_id = 3303
+GROUP BY yw.department_name
+
+查询模板（出账卡数，fact>0）：
+SELECT yw.department_name AS "广电站",
+       COUNT(DISTINCT CASE WHEN aiub.pri_card_id IS NULL THEN yw.access_num END) AS "主卡出账卡数",
+       COUNT(DISTINCT CASE WHEN aiub.pri_card_id IS NOT NULL THEN yw.access_num END) AS "副卡出账卡数"
+FROM repcx.ADS_ITEM_USER_BILL_M_$1 aiub,
+     repcx.rep_fact_yw_um_subscriber_info_$a4 yw
+WHERE yw.user_id(+) = aiub.user_id
+  AND aiub.corp_org_id = 3303
+  AND aiub.fact > 0
+GROUP BY yw.department_name
+注：$1 = 上月（yyyymm），$a4 = 上月底最后一天（yyyymmdd）
 
 # 图表生成（重要！）
 当用户需求中提到"生成图表"、"生成柱状图"、"生成饼状图"、"生成折线图"、"画图"、"可视化"等关键词时：
@@ -432,7 +474,27 @@ ${dataStr}
 			throw new Error("AI未返回有效的图表配置");
 		}
 
-		return JSON.parse(jsonMatch[0]);
+		let jsonStr = jsonMatch[0];
+
+		try {
+			return JSON.parse(jsonStr);
+		} catch (parseErr) {
+			this.ctx.logger.warn("[generateChart] JSON解析失败，尝试修复:", parseErr.message);
+
+			jsonStr = jsonStr
+				.replace(/,\s*}/g, "}")
+				.replace(/,\s*\]/g, "]")
+				.replace(/,\s*,/g, ",");
+
+			try {
+				return JSON.parse(jsonStr);
+			} catch (repairErr) {
+				this.ctx.logger.error("[generateChart] 修复后仍解析失败，原始内容:", content);
+				throw new Error(
+					`AI返回的图表配置格式有误: ${repairErr.message}`,
+				);
+			}
+		}
 	}
 }
 
