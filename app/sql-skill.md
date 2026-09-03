@@ -90,7 +90,7 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | COMMISSION_RATIO | NUMBER(30) | 提成比例 |
 | COMMISSION_TYPE | VARCHAR2(106) | 提成类型 |
 | CREATE_DATE | DATE | 创建时间 |
-| BUSINESS_TYPE | NUMBER(30) | 业务类型，10=缴费 |
+| BUSINESS_TYPE | NUMBER(30) | 业务类型：10=缴费存入, 12=预存转兑存入, 13=退费存入, 14=转账存入, 20=清退支出, 24=转账支出 |
 | BUSINESS_TYPE_ID | NUMBER(30) | 业务类型ID |
 | CHANNEL_ID | NUMBER(30) | 渠道ID |
 | PAYMENT_MODE_ID | NUMBER(30) | 支付方式ID |
