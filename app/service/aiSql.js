@@ -135,7 +135,7 @@ GROUP BY yw.department_name
 只输出完整的 Oracle SQL 语句（不含分号），不要输出任何解释说明。
 SQL 中关键字大写（SELECT, FROM, WHERE, JOIN），表名/字段名保持原样。
 SQL 第一行必须写注释 -- 由AI生成，请人工审核
-如果回填用户需求作为注释，每一行都要以 -- 开头，不能出现无注释前缀的纯文本，否则立即执行会报错
+需求回填必须保持一行，最多50字符，超出截断加...，严禁换行，否则立即执行会报错
 用 \`\`\`sql 代码块包裹。`;
 
 class AiSqlService extends Service {
