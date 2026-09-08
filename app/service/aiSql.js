@@ -132,10 +132,10 @@ GROUP BY yw.department_name
 3. 列名使用中文别名，图表生成时会自动识别为坐标轴名称
 
 # 输出格式
+先输出一行任务名，格式为 --任务名：xxx（根据需求概括，不超过20字），然后换行输出SQL。
 只输出完整的 Oracle SQL 语句（不含分号），不要输出任何解释说明。
 SQL 中关键字大写（SELECT, FROM, WHERE, JOIN），表名/字段名保持原样。
 SQL 第一行必须写注释 -- 由AI生成，请人工审核
-需求回填必须保持一行，最多50字符，超出截断加...，严禁换行，否则立即执行会报错
 用 \`\`\`sql 代码块包裹。`;
 
 class AiSqlService extends Service {
@@ -158,7 +158,8 @@ class AiSqlService extends Service {
 		if (fewShotExamples.length > 0) {
 			examples = "\n## Few-Shot 示例\n";
 			fewShotExamples.forEach((ex) => {
-				examples += `\n**需求**：${ex.requirement}\n\n**返回**：\n\`\`\`sql\n${ex.sql}\n\`\`\`\n`;
+				const demoName = ex.requirement.replace(/\s+/g, "").substring(0, 20);
+				examples += `\n**需求**：${ex.requirement}\n\n**返回**：\n--任务名：${demoName}\n\`\`\`sql\n${ex.sql}\n\`\`\`\n`;
 			});
 		}
 
@@ -306,11 +307,21 @@ ${examples}
 			reader.releaseLock();
 		}
 
+		// 解析AI归纳的任务名（--任务名：xxx 或 任务名：xxx）
+		let aiTaskName = "";
+		const taskNameMatch = fullContent.match(/(?:--)?任务名[：:]\s*(.+)/);
+		if (taskNameMatch) {
+			aiTaskName = taskNameMatch[1].trim().replace(/["'""「」『』]/g, "").substring(0, 20);
+			fullContent = fullContent.replace(/(?:--)?任务名[：:].+\n?/, "");
+		}
+		// 未解析到则用需求截断
+		const finalTaskName = aiTaskName || requirement.replace(/\s+/g, "").substring(0, 20);
+
 		const sql = fullContent
 			.replace(/```sql\s*/gi, "")
 			.replace(/```\s*/g, "")
 			.trim();
-		yield { type: "done", sql, prompt: requirement };
+		yield { type: "done", sql, prompt: requirement, taskName: finalTaskName };
 	}
 
 	async mergeDailyReports(templateHeaders, templateRows, dailyFiles) {
