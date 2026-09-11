@@ -223,7 +223,7 @@ class BigDataController extends Controller {
 
 	async generateSql() {
 		const { ctx, service } = this;
-		const { requirement, prompt } = ctx.request.body;
+		const { requirement, prompt, model } = ctx.request.body;
 		const query = requirement || prompt;
 		if (!query) {
 			return ctx.sendError("请输入取数需求描述");
@@ -253,25 +253,21 @@ class BigDataController extends Controller {
 			}
 		}
 
-		ctx.set("Content-Type", "text/event-stream");
-		ctx.set("Cache-Control", "no-cache");
-		ctx.set("Connection", "keep-alive");
-		ctx.status = 200;
-
 		try {
-			for await (const event of service.aiSql.generateStream(
-				query,
-				attachmentText,
-			)) {
-				ctx.res.write(`data: ${JSON.stringify(event)}\n\n`);
-			}
-		} catch (e) {
-			ctx.res.write(
-				`data: ${JSON.stringify({ type: "error", message: e.message || "AI服务异常" })}\n\n`,
-			);
+		ctx.response.set("Content-Type", "text/event-stream");
+		ctx.response.set("Cache-Control", "no-cache");
+		ctx.response.set("Connection", "keep-alive");
+
+		const stream = service.aiSql.generateStream(query, attachmentText, model);
+		for await (const event of stream) {
+			ctx.response.write(`data: ${JSON.stringify(event)}\n\n`);
 		}
-		ctx.res.end();
+	} catch (e) {
+		ctx.response.write(`data: ${JSON.stringify({ type: "error", message: e.message || "AI服务异常" })}\n\n`);
+	} finally {
+		ctx.response.end();
 	}
+}
 
 	async generateChart() {
 		const { ctx, service } = this;

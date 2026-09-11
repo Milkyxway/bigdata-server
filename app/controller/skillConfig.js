@@ -64,6 +64,18 @@ class SkillConfigController extends Controller {
 			return ctx.sendError(e.message || "获取提示词失败");
 		}
 	}
+
+	async deletePrompt() {
+		const { ctx, service } = this;
+		try {
+			const { prompt } = ctx.request.body;
+			if (!prompt) return ctx.sendError("prompt 不能为空");
+			await service.skillConfig.deletePrompt(prompt);
+			return ctx.sendSuccess(null, "删除成功");
+		} catch (e) {
+			return ctx.sendError(e.message || "删除失败");
+		}
+	}
 }
 
 module.exports = SkillConfigController;

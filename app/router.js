@@ -74,4 +74,5 @@ module.exports = (app) => {
 	router.post("/api/skill/ai-append", controller.skillConfig.aiAppend);
 	router.post("/api/skill/delete", controller.skillConfig.deleteItem);
 	router.get("/api/skill/recent-prompts", controller.skillConfig.recentPrompts);
+	router.post("/api/skill/delete-prompt", controller.skillConfig.deletePrompt);
 };

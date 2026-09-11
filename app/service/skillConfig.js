@@ -528,6 +528,19 @@ ${rawText.trim()}`,
 			return [];
 		}
 	}
+
+	async deletePrompt(prompt) {
+		if (!prompt) return;
+		const promptsPath = this._getPromptsPath();
+		if (!fs.existsSync(promptsPath)) return;
+		try {
+			let prompts = JSON.parse(fs.readFileSync(promptsPath, "utf-8"));
+			prompts = prompts.filter((p) => p !== prompt);
+			fs.writeFileSync(promptsPath, JSON.stringify(prompts, null, 2), "utf-8");
+		} catch (e) {
+			// 文件不存在或解析失败，忽略
+		}
+	}
 }
 
 module.exports = SkillConfigService;

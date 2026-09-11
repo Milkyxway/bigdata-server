@@ -177,47 +177,33 @@ ${examples}
 现在请根据以下用户需求生成SQL：`;
 	}
 
-	async _callApi(requirement, attachmentText) {
+	async *_callApiStream(requirement, attachmentText, model) {
 		const systemPrompt = await this._buildSystemPrompt();
 		const userMessage = attachmentText
 			? `${requirement}\n${attachmentText}`
 			: requirement;
-		const { apiKey, baseURL, model, timeout } = this.config.deepseek;
+		const { apiKey, baseURL, timeout } = this.config.deepseek;
+		const useModel = model || this.config.deepseek.model;
 		const url = `${baseURL}/chat/completions`;
 
-		const controller = new AbortController();
-		const timer = setTimeout(() => controller.abort(), timeout || 30000);
-
-		let resp;
-		try {
-			resp = await fetch(url, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${apiKey}`,
-				},
-				body: JSON.stringify({
-					model,
-					messages: [
-						{ role: "system", content: systemPrompt },
-						{ role: "user", content: userMessage },
-					],
-					temperature: 0.1,
-					max_tokens: 4096,
-					stream: true,
-				}),
-				signal: controller.signal,
-			});
-		} catch (e) {
-			if (e.name === "AbortError") {
-				throw new Error(
-					`DeepSeek API 请求超时（${(timeout || 30000) / 1000}秒），请稍后重试`,
-				);
-			}
-			throw e;
-		} finally {
-			clearTimeout(timer);
-		}
+		const resp = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${apiKey}`,
+			},
+			body: JSON.stringify({
+				model: useModel,
+				messages: [
+					{ role: "system", content: systemPrompt },
+					{ role: "user", content: userMessage },
+				],
+				temperature: 0.1,
+				max_tokens: 16384,
+				stream: true,
+			}),
+			signal: AbortSignal.timeout(timeout || 300000),
+		});
 
 		if (!resp.ok) {
 			const errText = await resp.text();
@@ -226,102 +212,106 @@ ${examples}
 			);
 		}
 
-		return resp.body;
-	}
-
-	async generate(requirement, attachmentText) {
-		this.ctx.service.skillConfig.savePrompt(requirement);
-		const stream = await this._callApi(requirement, attachmentText);
-		const reader = stream.getReader();
+		const reader = resp.body.getReader();
 		const decoder = new TextDecoder();
+		let buffer = "";
 		let fullContent = "";
 
-		try {
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
 
-				const chunk = decoder.decode(value, { stream: true });
-				const lines = chunk.split("\n");
+			// 关键修复：用 buffer 缓存不完整的行，防止 TCP 分包导致 JSON 解析失败丢字段
+			buffer += decoder.decode(value, { stream: true });
+			const lines = buffer.split("\n");
+			buffer = lines.pop();
 
-				for (const line of lines) {
-					if (line.startsWith("data: ")) {
-						const data = line.slice(6).trim();
-						if (data === "[DONE]") continue;
-						try {
-							const parsed = JSON.parse(data);
-							const delta = parsed.choices?.[0]?.delta?.content;
-							if (delta) {
-								fullContent += delta;
-							}
-						} catch (e) {
-							// 跳过非JSON行
+			for (const line of lines) {
+				if (line.startsWith("data: ")) {
+					const data = line.slice(6).trim();
+					if (data === "[DONE]") continue;
+					try {
+						const parsed = JSON.parse(data);
+						const delta = parsed.choices?.[0]?.delta?.content;
+						if (delta) {
+							fullContent += delta;
+							yield { type: "chunk", content: delta };
 						}
+					} catch (e) {
+						// 跳过无法解析的行
 					}
 				}
 			}
-		} finally {
-			reader.releaseLock();
 		}
 
-		const sql = fullContent
-			.replace(/```sql\s*/gi, "")
-			.replace(/```\s*/g, "")
-			.trim();
-		return sql;
-	}
-
-	async *generateStream(requirement, attachmentText) {
-		this.ctx.service.skillConfig.savePrompt(requirement);
-		const stream = await this._callApi(requirement, attachmentText);
-		const reader = stream.getReader();
-		const decoder = new TextDecoder();
-		let fullContent = "";
-
-		try {
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-
-				const chunk = decoder.decode(value, { stream: true });
-				const lines = chunk.split("\n");
-
-				for (const line of lines) {
-					if (line.startsWith("data: ")) {
-						const data = line.slice(6).trim();
-						if (data === "[DONE]") continue;
-						try {
-							const parsed = JSON.parse(data);
-							const delta = parsed.choices?.[0]?.delta?.content;
-							if (delta) {
-								fullContent += delta;
-								yield { type: "chunk", content: delta };
-							}
-						} catch (e) {
-							// 跳过非JSON行
-						}
+		// 处理 buffer 中剩余的最后一条数据
+		if (buffer.startsWith("data: ")) {
+			const data = buffer.slice(6).trim();
+			if (data && data !== "[DONE]") {
+				try {
+					const parsed = JSON.parse(data);
+					const delta = parsed.choices?.[0]?.delta?.content;
+					if (delta) {
+						fullContent += delta;
+						yield { type: "chunk", content: delta };
 					}
+				} catch (e) {
+					// 忽略
 				}
 			}
-		} finally {
-			reader.releaseLock();
 		}
 
-		// 解析AI归纳的任务名（--任务名：xxx 或 任务名：xxx）
+		// 解析AI归纳的任务名
 		let aiTaskName = "";
 		const taskNameMatch = fullContent.match(/(?:--)?任务名[：:]\s*(.+)/);
 		if (taskNameMatch) {
 			aiTaskName = taskNameMatch[1].trim().replace(/["'""「」『』]/g, "").substring(0, 20);
-			fullContent = fullContent.replace(/(?:--)?任务名[：:].+\n?/, "");
 		}
-		// 未解析到则用需求截断
 		const finalTaskName = aiTaskName || requirement.replace(/\s+/g, "").substring(0, 20);
 
 		const sql = fullContent
 			.replace(/```sql\s*/gi, "")
 			.replace(/```\s*/g, "")
 			.trim();
-		yield { type: "done", sql, prompt: requirement, taskName: finalTaskName };
+
+		yield { type: "done", sql, taskName: finalTaskName };
+	}
+
+	async *generateStream(requirement, attachmentText, model) {
+		this.ctx.service.skillConfig.savePrompt(requirement);
+		yield* this._callApiStream(requirement, attachmentText, model);
+	}
+
+	async generate(requirement, attachmentText, model) {
+		this.ctx.service.skillConfig.savePrompt(requirement);
+		let sql = "";
+		let taskName = "";
+		for await (const event of this._callApiStream(requirement, attachmentText, model)) {
+			if (event.type === "done") {
+				sql = event.sql;
+				taskName = event.taskName;
+			}
+		}
+		return { sql, taskName };
+	}
+
+	async _generateOld(requirement, attachmentText, model) {
+		this.ctx.service.skillConfig.savePrompt(requirement);
+		const content = await this._callApi(requirement, attachmentText, model);
+
+		// 解析AI归纳的任务名（--任务名：xxx 或 任务名：xxx）
+		let aiTaskName = "";
+		const taskNameMatch = content.match(/(?:--)?任务名[：:]\s*(.+)/);
+		if (taskNameMatch) {
+			aiTaskName = taskNameMatch[1].trim().replace(/["'""「」『』]/g, "").substring(0, 20);
+		}
+		const finalTaskName = aiTaskName || requirement.replace(/\s+/g, "").substring(0, 20);
+
+		const sql = content
+			.replace(/```sql\s*/gi, "")
+			.replace(/```\s*/g, "")
+			.trim();
+		return { sql, taskName: finalTaskName };
 	}
 
 	async mergeDailyReports(templateHeaders, templateRows, dailyFiles) {
