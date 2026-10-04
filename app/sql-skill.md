@@ -70,6 +70,8 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | rep.DWA_CRM_KD_BEHAVIOR_yyyymmdd  | PROD_INST_ID      | rep.DWA_KD_BEHAVIOR_UPDATE_yyyymmdd| SUBSCRIBER_INS_ID | 1:1  | UNION合并为完整宽带行为记录，序列号关联终端 |
 | 宽带行为记录(UNION)               | 序列号(PROD_INST_ID/SUBSCRIBER_INS_ID) | files2.um_subscriber          | SUBSCRIBER_INS_ID | 1:1  | 宽带行为关联终端       |
 | 宽带行为记录(UNION)               | 序列号(PROD_INST_ID/SUBSCRIBER_INS_ID) | rep.rep_fact_lan_cust_new_yyyymmdd | SUBSCRIBER_INS_ID | 1:1  | 宽带行为关联有价宽带 |
+| rep2.rep_fact_balance_yyyymmdd   | ACCT_ID           | files2.cm_account                  | ACCT_ID           | 1:1  | 余额表关联账户（获取CUST_ID） |
+| files2.cm_account                | CUST_ID           | rep2.rep_fact_cust_info_yyyymmdd   | CUST_ID           | 1:1  | 账户关联客户（获取广电站、地市） |
 
 ## 表结构
 
@@ -79,38 +81,17 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | CUST_ID | NUMBER(30) | 客户ID |
 | CUST_CODE | VARCHAR2(255) | 客户证号 |
 | ACCT_ID | NUMBER(30) | 账户ID |
-| BUSINESS_ID | NUMBER(30) | 业务ID |
-| INCOME_TYPE | NUMBER(30) | 收入类型 |
-| ACCT_BALANCE_ID | NUMBER(30) | 账户余额ID |
 | ASSET_ITEM_ID | NUMBER(30) | 账本ID，100=通用现金账本 |
 | AMOUNT | NUMBER(30) | 金额（分） |
 | COMMISSION_AMOUNT | NUMBER(30) | 提成金额 |
-| COMMISSION_RATIO | NUMBER(30) | 提成比例 |
-| COMMISSION_TYPE | VARCHAR2(106) | 提成类型 |
 | CREATE_DATE | DATE | 创建时间 |
 | BUSINESS_TYPE | NUMBER(30) | 业务类型：10=缴费存入, 12=预存转兑存入, 13=退费存入, 14=转账存入, 20=清退支出, 24=转账支出 |
-| BUSINESS_TYPE_ID | NUMBER(30) | 业务类型ID |
-| CHANNEL_ID | NUMBER(30) | 渠道ID |
-| PAYMENT_MODE_ID | NUMBER(30) | 支付方式ID |
-| STAFF_ID | VARCHAR2(255) | 员工ID |
-| STAFF_NAME | VARCHAR2(200) | 员工姓名 |
-| STAFF_PHONE | VARCHAR2(50) | 员工手机号 |
-| STAFF_ORGANIZE_ID | VARCHAR2(255) | 员工组织ID |
-| STAFF_ORGANIZE_NAME | VARCHAR2(200) | 员工组织名称 |
-| TRADE_ORGANIZE_ID | NUMBER(30) | 交易组织ID |
-| TRADE_ORGANIZE_NAME | VARCHAR2(200) | 交易组织名称 |
-| REMARK | VARCHAR2(512) | 备注 |
-| NOTE_ID | NUMBER(30) | 票据ID |
 | DEV_ID | NUMBER(30) | 发展人ID |
 | DEV_NAME | VARCHAR2(255) | 发展人姓名 |
 | DEV_PHONE | VARCHAR2(50) | 发展人手机号 |
 | DEPARTMENT_NAME | VARCHAR2(511) | 发展人部门名称 |
 | CORP_ORG_ID | NUMBER(30) | 公司ID |
 | CORP_ORG_NAME | VARCHAR2(100) | 公司名称 |
-| MARK | VARCHAR2(255) | 标记 |
-| CUST_TYPE | NUMBER(30) | 客户类型 |
-| MS_AREA_ID | VARCHAR2(24) | 网格ID |
-| ETL_DATE | DATE | ETL日期 |
 
 ### rep2.rep_fact_ins_srvpkg_yyyymmdd（产品订购表）
 > 日分区表，订购正常口径：srvpkg_state='1' AND srvpkg_os_status IS NULL
@@ -151,27 +132,18 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 
 
 ### rep2.rep_fact_um_subscriber_yyyymmdd（终端订阅状态表，日分区）
-| 字段名                 | 类型         | 说明                                            |
-| :--------------------- | :----------- | :---------------------------------------------- |
-| SUBSCRIBER_INS_ID      | NUMBER(30)   | 终端序列号                                      |
-| MAIN_SPEC_ID           | NUMBER(30)   | 主规格ID，80020003=宽带,80020001=电视           |
-| CUST_ID                | NUMBER(30)   | 客户ID                                          |
-| SUBSCRIBER_TYPE        | VARCHAR2(255)| 终端类型                                        |
-
-| MAIN_SUBSCRIBER_INS_ID | NUMBER(30)   | 主终端序列号                                    |
-
-| CORP_ORG_ID            | NUMBER(30)   | 分公司ID                                        |
-| IS_DTV                 | NUMBER(30)   | 是否数字电视                                    |
-| IS_DFTV                | NUMBER(30)   | 是否付费电视                                    |
-| IS_DBITV               | NUMBER(30)   | 是否互动电视                                    |
-| IS_DBITV_PAIED         | NUMBER(30)   | 互动电视缴费中 1=已缴费,0=未缴费                |
-| IS_DITV                | NUMBER(30)   | 是否数字互动电视                                |
-| IS_LAN                 | NUMBER(30)   | 是否宽带                                        |
-
-| IS_LAN_VALID           | NUMBER(30)   | 宽带是否有效                                    |
-| IS_LAN_PAIED           | NUMBER(30)   | 宽带缴费中 1=已缴费,0=未缴费                    |
-
-| IS_PAIED               | NUMBER(30)   | 电视业务缴费中 1=已缴费,0=未缴费                |
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| SUBSCRIBER_INS_ID | NUMBER(30) | 终端序列号 |
+| MAIN_SPEC_ID | NUMBER(30) | 主规格ID，80020003=宽带,80020001=电视 |
+| MAIN_SUBSCRIBER_INS_ID | NUMBER(30) | 主终端序列号 |
+| CUST_ID | NUMBER(30) | 客户ID |
+| CORP_ORG_ID | NUMBER(30) | 分公司ID |
+| IS_PAIED | NUMBER(30) | 电视缴费中 1=已缴费,0=未缴费 |
+| IS_LAN | NUMBER(30) | 是否宽带 |
+| IS_LAN_PAIED | NUMBER(30) | 宽带缴费中 1=已缴费,0=未缴费 |
+| IS_DBITV | NUMBER(30) | 是否互动电视 |
+| IS_DBITV_PAIED | NUMBER(30) | 互动缴费中 1=已缴费,0=未缴费 |
 
 
 ### ac2.am_bill_ar_yyyymm（出账月表，月分区）
@@ -210,79 +182,46 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 
 
 ### files2.um_res（终端物理信息表）
-| 字段名               | 类型          | 说明                     |
-| :------------------- | :------------ | :----------------------- |
-| SUBSCRIBER_INS_ID    | NUMBER(16)    | 终端序列号，关联终端表   |
-| CUST_ID              | NUMBER(16)    | 客户ID                   |
-| RES_TYPE_ID          | VARCHAR2(50)  | 资源类型ID               |
-| RES_TYPE_NAME        | VARCHAR2(255) | 资源类型名称             |
-
-| RES_EQU_NO           | VARCHAR2(64)  | 设备编号1                |
-
-| RES_SKU_ID           | VARCHAR2(64)  | SKU ID                   |
-| RES_SKU_NAME         | VARCHAR2(128) | SKU名称                  |
-
-| VALID_DATE           | DATE          | 生效日期                 |
-| EXPIRE_DATE          | DATE          | 失效日期                 |
-| CREATE_DATE          | DATE          | 创建日期                 |
-| DONE_DATE            | DATE          | 完成日期                 |
-| CORP_ORG_ID          | NUMBER(12)    | 归属分公司               |
-| OWN_CORP_ORG_ID      | NUMBER(12)    | 所属分公司               |
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| SUBSCRIBER_INS_ID | NUMBER(16) | 终端序列号，关联终端表 |
+| CUST_ID | NUMBER(16) | 客户ID |
+| RES_TYPE_ID | VARCHAR2(50) | 资源类型ID |
+| RES_TYPE_NAME | VARCHAR2(255) | 资源类型名称 |
+| RES_EQU_NO | VARCHAR2(64) | 设备编号 |
+| RES_SKU_ID | VARCHAR2(64) | SKU ID |
+| RES_SKU_NAME | VARCHAR2(128) | SKU名称 |
+| CREATE_DATE | DATE | 创建日期 |
+| CORP_ORG_ID | NUMBER(12) | 归属分公司 |
 
 ### files2.um_subscriber（终端用户信息表）
-| 字段名               | 类型          | 说明                     |
-| :------------------- | :------------ | :----------------------- |
-| SUBSCRIBER_INS_ID    | NUMBER(16)    | 用户实例标识（主键）     |
-| CUST_ID              | NUMBER(16)    | 客户标识                 |
-| BILL_ID              | VARCHAR2(120) | 机顶盒号                 |
-| SUB_BILL_ID          | VARCHAR2(50)  | 卡号（次计费号）         |
-| USER_NAME            | VARCHAR2(255) | 用户名                   |
-| LOGIN_NAME           | VARCHAR2(64)  | 宽带账号名               |
-| SUBSCRIBER_TYPE      | VARCHAR2(6)   | 用户类型                 |
-| STATE                | VARCHAR2(3)   | 用户状态：1=正常,M=停机,C=预销,D=注销 |
-| CORP_ORG_ID          | NUMBER(12)    | 操作员归属分公司         |
-| OWN_CORP_ORG_ID      | NUMBER(12)    | 客户归属分公司           |
-| VALID_DATE           | DATE          | 生效日期                 |
-| EXPIRE_DATE          | DATE          | 失效日期                 |
-| CREATE_DATE          | DATE          | 创建日期                 |
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| SUBSCRIBER_INS_ID | NUMBER(16) | 终端实例标识（主键） |
+| CUST_ID | NUMBER(16) | 客户标识 |
+| BILL_ID | VARCHAR2(120) | 机顶盒号 |
+| LOGIN_NAME | VARCHAR2(64) | 宽带账号名 |
+| SUBSCRIBER_TYPE | VARCHAR2(6) | 用户类型 |
+| STATE | VARCHAR2(3) | 用户状态：1=正常,M=停机,C=预销,D=注销 |
+| CORP_ORG_ID | NUMBER(12) | 分公司ID |
+| VALID_DATE | DATE | 生效日期 |
+| EXPIRE_DATE | DATE | 失效日期 |
+| CREATE_DATE | DATE | 创建日期 |
 
 
 ### rep.fin2_received_fee_dev_yyyymm（发展人实收发票明细表，月分区）
-| 字段名               | 类型          | 说明                     |
-| :------------------- | :------------ | :----------------------- |
-| BUSINESS_ID          | NUMBER(16)    | 业务ID                   |
-| CORP_ORG_ID          | NUMBER(9)     | 分公司ID                 |
-| 客户证号             | VARCHAR2(20)  | 客户证号                 |
-| 客户姓名             | VARCHAR2(128) | 客户姓名                 |
-| 业务类型             | VARCHAR2(100) | 业务类型                 |
-| 受理时间             | DATE          | 受理时间                 |
-| 出票时间             | DATE          | 出票时间                 |
-| 发票号码             | VARCHAR2(20)  | 发票号码                 |
-| 发票代码             | VARCHAR2(20)  | 发票代码                 |
-| 开票时间             | DATE          | 开票时间                 |
-| 发票类型             | VARCHAR2(18)  | 发票类型                 |
-| BOSS科目ID           | NUMBER(16)    | BOSS科目ID               |
-| BOSS科目名称         | VARCHAR2(100) | BOSS科目名称             |
-| 发票金额             | NUMBER        | 发票金额                 |
-| 发票状态             | VARCHAR2(12)  | 发票状态                 |
-| PAYMENT_MODE         | NUMBER        | 缴费方式编码             |
-| 缴费方式             | VARCHAR2(100) | 缴费方式                 |
-| STAFF_ID             | VARCHAR2(12)  | 员工ID                   |
-| STAFF_NAME           | VARCHAR2(200) | 员工姓名                 |
-| STAFF_ORGANIZE_ID    | NUMBER        | 员工组织ID               |
-| STAFF_ORGANIZE_NAME  | VARCHAR2(200) | 员工组织名称             |
-| TRADE_ORGANIZE_ID    | NUMBER        | 交易组织ID               |
-| TRADE_ORGANIZE_NAME  | VARCHAR2(200) | 交易组织名称             |
-| TRADE_DATE           | DATE          | 交易日期                 |
-| REMARK               | VARCHAR2(300) | 备注                     |
-| DEV_ID               | NUMBER(16)    | 发展人ID                 |
-| DEV_NAME             | VARCHAR2(255) | 发展人姓名               |
-| DEV_PHONE            | VARCHAR2(50)  | 发展人电话               |
-| DEPARTMENT_NAME      | VARCHAR2(511) | 部门名称                 |
-| INFO_ORD_DEV_ID      | VARCHAR2(20)  | 信息订购发展人ID         |
-| INFO_CANCEL_DEV_ID   | VARCHAR2(20)  | 信息退订发展人ID         |
-| ORD_DEV_ID           | VARCHAR2(100) | 订购发展人ID             |
-| ORD_CANCEL_DEV_ID    | VARCHAR2(100) | 退订发展人ID             |
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| BUSINESS_ID | NUMBER(16) | 业务ID |
+| 客户证号 | VARCHAR2(20) | 客户证号 |
+| CORP_ORG_ID | NUMBER(9) | 分公司ID |
+| 发票金额 | NUMBER | 发票金额 |
+| 缴费方式 | VARCHAR2(100) | 缴费方式 |
+| TRADE_DATE | DATE | 交易日期 |
+| DEV_ID | NUMBER(16) | 发展人ID |
+| DEV_NAME | VARCHAR2(255) | 发展人姓名 |
+| DEV_PHONE | VARCHAR2(50) | 发展人电话 |
+| DEPARTMENT_NAME | VARCHAR2(511) | 部门名称 |
 
 ### dwd.dwd_all_movie_detail_yyyymm（点播明细表，月分区）
 | 字段名       | 类型         | 说明                                    |
@@ -292,53 +231,32 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 ### DWA_KD_BEHAVIOR_UPDATE_YYYYMMDD（宽带使用记录表，日分区，取 t-4）
 | 字段名 | 类型 | 说明 |
 | :--- | :--- | :--- |
-| AREA_ID | NUMBER(16) | 区域ID |
-| AREA | VARCHAR2(254) | 区域 |
-| CORP_ORG_ID | NUMBER(32) | 公司ID |
-| CORP_ORG_NAME | VARCHAR2(254) | 公司名称 |
 | CUST_CODE | VARCHAR2(254) | 客户证号 |
 | SUBSCRIBER_INS_ID | NUMBER(32) | 终端实例ID |
-| USER_NAME | VARCHAR2(254) | 用户名 |
 | ONLINE_DAYS | NUMBER(32) | 在线天数 |
-| RES_EQU_NO | VARCHAR2(254) | 设备编号 |
-| OFFER_ID | NUMBER(32) | 套餐ID |
-| CREATE_DATE | VARCHAR2(254) | 创建时间 |
-| DONE_DATE | VARCHAR2(254) | 完成时间 |
-| CMMAC | VARCHAR2(254) | MAC地址 |
-| START_TIME | VARCHAR2(254) | 开始时间 |
-| STOP_TIME | VARCHAR2(254) | 结束时间 |
 | ONLINE_DURATION | VARCHAR2(254) | 在线时长 |
-| UPDATE_TIME | VARCHAR2(254) | 更新时间 |
+| OFFER_ID | NUMBER(32) | 套餐ID |
+| CORP_ORG_ID | NUMBER(32) | 公司ID |
+| CORP_ORG_NAME | VARCHAR2(254) | 公司名称 |
 | BRAS_INPUT_OCTETS | VARCHAR2(254) | 上行流量(字节) |
 | BRAS_OUTPUT_OCTETS | VARCHAR2(254) | 下行流量(字节) |
-| BOSS_TYPE | VARCHAR2(254) | BOSS类型 |
-| ETL_TIME | VARCHAR2(254) | ETL时间 |
 | DT | VARCHAR2(32) | 日期分区 yyyymmdd，取 t-4 |
 
 ### rep.DWA_CRM_KD_BEHAVIOR_YYYYMMDD（宽带使用记录表，日分区，取 t-4）
 | 字段名 | 类型 | 说明 |
 | :--- | :--- | :--- |
-| AREA_ID | NUMBER(30) | 区域ID |
-| AREA | VARCHAR2(255) | 区域 |
+| CUST_CODE | VARCHAR2(255) | 客户证号 |
+| LOGIN_NAME | VARCHAR2(255) | 登录名 |
+| PROD_INST_ID | NUMBER(30) | 产品实例ID |
+| SRVPKG_ID | NUMBER(30) | 套餐ID |
 | CORP_ORG_ID | NUMBER(30) | 公司ID |
 | CORP_ORG_NAME | VARCHAR2(255) | 公司名称 |
-| CUST_CODE | VARCHAR2(255) | 客户证号 |
-| PROD_INST_ID | NUMBER(30) | 产品实例ID |
-| LOGIN_NAME | VARCHAR2(255) | 登录名 |
-| RES_EQU_NO | VARCHAR2(255) | 设备编号 |
-| SRVPKG_ID | NUMBER(30) | 套餐ID |
-| CREATE_DATE | VARCHAR2(255) | 创建时间 |
-| DONE_DATE | VARCHAR2(255) | 完成时间 |
-| CMMAC | VARCHAR2(255) | MAC地址 |
 | FIRST_TIME | VARCHAR2(255) | 首次时间 |
 | LAST_TIME | VARCHAR2(255) | 最后时间 |
 | PLAY_NUM | NUMBER(30) | 播放次数 |
 | PLAY_DURATION | NUMBER(30) | 播放时长 |
 | INPUT_OCTETS | NUMBER(30) | 上行流量(字节) |
 | OUTPUT_OCTETS | NUMBER(30) | 下行流量(字节) |
-| AREA_TYPE | VARCHAR2(8) | 区域类型 |
-| BOSS_TYPE | VARCHAR2(8) | BOSS类型 |
-| ETL_TIME | VARCHAR2(32) | ETL时间 |
 | DT | VARCHAR2(16) | 日期分区 yyyymmdd，取 t-4 |
 
 ### rep.rep_fact_lan_cust_new_yyyymmdd（有价宽带表，日分区，最小颗粒到终端 subscriber_ins_id）
@@ -374,3 +292,23 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | DEV_ID | VARCHAR2(100) | 发展人ID |
 | own_corp_org_id | VARCHAR2(512) | 公司ID |
 |
+
+### rep2.rep_fact_cust_info_yyyymmdd（客户信息表，日分区）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| CUST_ID | NUMBER(16) | 客户ID |
+| CUST_CODE | VARCHAR2(50) | 客户编码/手机号 |
+| PARTY_NAME | VARCHAR2(200) | 客户名称 |
+| STAND_NAME | VARCHAR2(200) | 客户地址 |
+| CORP_ORG_ID | NUMBER(10) | 公司ID，3303=无锡 |
+| district_name | VARCHAR2(100) | 广电站名称 |
+| CUST_TYPE | NUMBER(2) | 客户类型 |
+| STATUS | VARCHAR2(10) | 客户状态 |
+| CREATE_TIME | DATE | 创建时间 |
+
+### rep2.rep_fact_balance_yyyymmdd（客户余额表，日分区）
+| 字段名 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| ACCT_ID | NUMBER(30) | 账户ID |
+| ASSET_ITEM_ID | NUMBER(30) | 账本ID '100'='通用现金账本， '200'='数字基本现金账本','300'='互动基本现金账本','600'='虚拟通用账本' |
+| BALANCE | NUMBER(30) | 余额 |

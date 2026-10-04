@@ -2,21 +2,123 @@ const Service = require("egg").Service;
 const fs = require("fs");
 const path = require("path");
 
-let TABLE_SCHEMA = null;
+let SCHEMA_PARSED = null;
 let RULES_CACHE = null;
 
-function loadTableSchema(baseDir) {
-	if (TABLE_SCHEMA) return TABLE_SCHEMA;
+// 解析 sql-skill.md，拆分为表关联关系 + 独立表结构块
+function parseSchema(baseDir) {
+	if (SCHEMA_PARSED) return SCHEMA_PARSED;
 	const skillPath = path.join(baseDir, "app", "sql-skill.md");
-	if (!fs.existsSync(skillPath)) return "";
+	if (!fs.existsSync(skillPath)) return { relationships: "", tables: [], directory: "", adjacency: {} };
 	const raw = fs.readFileSync(skillPath, "utf-8");
-	const idx = raw.indexOf("## 表关联关系");
-	if (idx !== -1) {
-		TABLE_SCHEMA = raw.substring(idx).trim();
+
+	const relIdx = raw.indexOf("## 表关联关系");
+	const structIdx = raw.indexOf("## 表结构");
+
+	let relationships = "";
+	let tableSection = "";
+
+	if (relIdx !== -1 && structIdx !== -1) {
+		relationships = raw.substring(relIdx, structIdx).trim();
+		tableSection = raw.substring(structIdx).trim();
+	} else if (relIdx !== -1) {
+		relationships = raw.substring(relIdx).trim();
 	} else {
-		TABLE_SCHEMA = raw;
+		relationships = raw;
 	}
-	return TABLE_SCHEMA;
+
+	// 拆分每个 ### 表块
+	const tables = [];
+	const directoryLines = [];
+
+	if (tableSection) {
+		const blocks = tableSection.split(/(?=^###\s)/m);
+		for (const block of blocks) {
+			const trimmed = block.trim();
+			if (!trimmed.startsWith("###")) continue;
+
+			// 提取表名和描述：### tableName（description）
+			const headerMatch = trimmed.match(/^###\s+(\S+)\s*[（(]([^)）]*)/);
+			if (!headerMatch) continue;
+
+			const name = headerMatch[1].trim();
+			const description = headerMatch[2] ? headerMatch[2].trim() : "";
+
+			// 从描述和字段说明中提取关键词
+			const keywords = new Set();
+			description.split(/[，,、\s/()（）]+/).forEach(kw => {
+				const k = kw.trim().toLowerCase();
+				if (k.length >= 2) keywords.add(k);
+			});
+			// 从字段说明（markdown 表格第3列）提取关键词
+			const fieldMatches = trimmed.matchAll(/\|[^|]*\|[^|]*\|([^|]*)\|/g);
+			for (const fm of fieldMatches) {
+				const fieldDesc = fm[1].trim();
+				fieldDesc.split(/[，,、=；;:\s()（）]+/).forEach(kw => {
+					const k = kw.trim().toLowerCase();
+					if (k.length >= 2 && !/^\d+$/.test(k)) keywords.add(k);
+				});
+			}
+
+			tables.push({ name, description, keywords: [...keywords], schema: trimmed });
+			directoryLines.push(`- ${name}（${description}）`);
+		}
+	}
+
+	// 解析表关联关系，构建邻接表（用于关联传播）
+	const adjacency = {};
+	if (relationships) {
+		for (const line of relationships.split("\n")) {
+			if (!line.includes("|")) continue;
+			const cells = line.split("|").map(c => c.trim()).filter(c => c.length > 0);
+			if (cells.length < 4) continue;
+			const mainTable = cells[0];
+			const subTable = cells[2];
+			if (!mainTable || !subTable) continue;
+			if (mainTable === "主表" || subTable === "从表") continue;
+			const mk = mainTable.toLowerCase();
+			const sk = subTable.toLowerCase();
+			if (!adjacency[mk]) adjacency[mk] = new Set();
+			if (!adjacency[sk]) adjacency[sk] = new Set();
+			adjacency[mk].add(sk);
+			adjacency[sk].add(mk);
+		}
+	}
+
+	SCHEMA_PARSED = { relationships, tables, directory: directoryLines.join("\n"), adjacency };
+	return SCHEMA_PARSED;
+}
+
+// 根据用户需求关键词匹配相关表 + 关联传播，未匹配则返回全部
+function selectTables(requirement, tables, adjacency) {
+	const reqLower = (requirement || "").toLowerCase();
+	const matchedNames = new Set();
+
+	// 第一轮：直接关键词匹配
+	for (const table of tables) {
+		for (const kw of table.keywords) {
+			if (reqLower.includes(kw)) {
+				matchedNames.add(table.name.toLowerCase());
+				break;
+			}
+		}
+	}
+
+	// 第二轮：表关联传播（1跳），自动带上 JOIN 关联表
+	const expandedNames = new Set(matchedNames);
+	for (const name of matchedNames) {
+		if (adjacency[name]) {
+			for (const related of adjacency[name]) {
+				expandedNames.add(related);
+			}
+		}
+	}
+
+	// 未匹配到任何表时返回全部（fallback）
+	const result = expandedNames.size > 0
+		? tables.filter(t => expandedNames.has(t.name.toLowerCase()))
+		: tables;
+	return result.map(t => t.schema).join("\n\n");
 }
 
 function loadRulesAndExamples(baseDir) {
@@ -28,7 +130,7 @@ function loadRulesAndExamples(baseDir) {
 }
 
 function reloadAll() {
-	TABLE_SCHEMA = null;
+	SCHEMA_PARSED = null;
 	RULES_CACHE = null;
 }
 
@@ -49,6 +151,7 @@ const STATIC_RULES = `
 6. 严禁使用 WITH 语句（CTE），必须用子查询或临时表替代
 7. 查询 files2.um_subscriber 表时，必须加条件 EXPIRE_DATE > SYSDATE，过滤已失效终端
 8. 查询终端明细时，取 um_subscriber 表的以下字段：BILL_ID（机顶盒号）、SUBSCRIBER_INS_ID、LOGIN_NAME（宽带账号名）、EXPIRE_DATE、SUBSCRIBER_TYPE（1=电视,3=宽带，需用 CASE WHEN 转中文）、SUB_BILL_ID（卡号）
+9. 用户上传附件时，附件中提供的值在 IN 条件中必须写成一行，不得换行。例如：WHERE col IN ('值1','值2','值3')，禁止写成多行
 
 # 金额处理
 - 所有金额字段以分为单位，必须 /100 并保留两位小数：ROUND(NVL(AMOUNT, 0)/100, 2) AS "金额"
@@ -125,6 +228,13 @@ WHERE yw.user_id(+) = aiub.user_id
 GROUP BY yw.department_name
 注：$1 = 上月（yyyymm），$a4 = 上月底最后一天（yyyymmdd）
 
+# 客户余额查询
+当用户需求中提到"余额"、"账本余额"、"现金账本余额"等关键词时：
+1. ASSET_ITEM_ID = 100 对应"通用现金账本"，即用户常说的"现金账本"；如需其他账本类型参考表结构中的枚举值
+2. BALANCE 字段单位为分，用户说的金额为元，需 ×100 换算（50元=5000分，100元=10000分）
+3. 余额表只有 ACCT_ID，需通过表关联关系中的 balance→cm_account→cust_info 链路获取广电站和地市
+4. 无锡过滤：CORP_ORG_ID = 3303
+
 # 图表生成（重要！）
 当用户需求中提到"生成图表"、"生成柱状图"、"生成饼状图"、"生成折线图"、"画图"、"可视化"等关键词时：
 1. 说明用户需要图表展示，系统会自动触发图表生成流程（ECharts渲染），你只需正常生成SQL即可
@@ -139,9 +249,12 @@ SQL 第一行必须写注释 -- 由AI生成，请人工审核
 用 \`\`\`sql 代码块包裹。`;
 
 class AiSqlService extends Service {
-	async _buildSystemPrompt() {
-		const tableSchema = loadTableSchema(this.app.baseDir);
+	async _buildSystemPrompt(requirement) {
+		const parsed = parseSchema(this.app.baseDir);
 		const { rules, fewShotExamples } = loadRulesAndExamples(this.app.baseDir);
+
+		// 根据用户需求关键词匹配相关表结构（RAG-lite）
+		const selectedSchemas = selectTables(requirement, parsed.tables, parsed.adjacency);
 
 		let businessRules = "";
 		if (rules.length > 0) {
@@ -166,7 +279,13 @@ class AiSqlService extends Service {
 		return `你是一名拥有 10 年经验的 Oracle 数据库开发专家，擅长 OLTP 系统的 Ad-hoc 查询（提数）和报表统计。
 根据用户需求编写高效、准确的 Oracle SQL（支持 11g/12c/19c），适用于 PL/SQL Developer 直接执行。
 
-${tableSchema}
+${parsed.relationships}
+
+## 可用表目录（如需其他表请参考上方表关联关系）
+${parsed.directory}
+
+## 匹配表结构（根据需求自动筛选）
+${selectedSchemas}
 
 ${STATIC_RULES}
 ${businessRules}
@@ -177,20 +296,26 @@ ${examples}
 现在请根据以下用户需求生成SQL：`;
 	}
 
-	async *_callApiStream(requirement, attachmentText, model) {
-		const systemPrompt = await this._buildSystemPrompt();
+	async _callApi(requirement, attachmentText, model) {
+		const systemPrompt = await this._buildSystemPrompt(requirement);
 		const userMessage = attachmentText
 			? `${requirement}\n${attachmentText}`
 			: requirement;
 		const { apiKey, baseURL, timeout } = this.config.deepseek;
-		const useModel = model || this.config.deepseek.model;
-		const url = `${baseURL}/chat/completions`;
+
+		// 直连快速模式：走 DeepSeek 官方 API
+		const isDirect = model === "deepseek-chat-direct";
+		this.ctx.logger.info('[AI] model参数:', model, '| isDirect:', isDirect, '| useBaseURL:', isDirect ? "https://api.deepseek.com/v1" : baseURL, '| useModel:', isDirect ? "deepseek-chat" : (model || this.config.deepseek.model));
+		const useApiKey = isDirect ? "sk-a2a142c936c74cd6ab7899268ca1269c" : apiKey;
+		const useBaseURL = isDirect ? "https://api.deepseek.com/v1" : baseURL;
+		const useModel = isDirect ? "deepseek-chat" : (model || this.config.deepseek.model);
+		const url = `${useBaseURL}/chat/completions`;
 
 		const resp = await fetch(url, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${apiKey}`,
+				Authorization: `Bearer ${useApiKey}`,
 			},
 			body: JSON.stringify({
 				model: useModel,
@@ -200,7 +325,7 @@ ${examples}
 				],
 				temperature: 0.1,
 				max_tokens: 16384,
-				stream: true,
+				stream: false,
 			}),
 			signal: AbortSignal.timeout(timeout || 300000),
 		});
@@ -212,94 +337,22 @@ ${examples}
 			);
 		}
 
-		const reader = resp.body.getReader();
-		const decoder = new TextDecoder();
-		let buffer = "";
-		let fullContent = "";
-
-		while (true) {
-			const { done, value } = await reader.read();
-			if (done) break;
-
-			// 关键修复：用 buffer 缓存不完整的行，防止 TCP 分包导致 JSON 解析失败丢字段
-			buffer += decoder.decode(value, { stream: true });
-			const lines = buffer.split("\n");
-			buffer = lines.pop();
-
-			for (const line of lines) {
-				if (line.startsWith("data: ")) {
-					const data = line.slice(6).trim();
-					if (data === "[DONE]") continue;
-					try {
-						const parsed = JSON.parse(data);
-						const delta = parsed.choices?.[0]?.delta?.content;
-						if (delta) {
-							fullContent += delta;
-							yield { type: "chunk", content: delta };
-						}
-					} catch (e) {
-						// 跳过无法解析的行
-					}
-				}
-			}
-		}
-
-		// 处理 buffer 中剩余的最后一条数据
-		if (buffer.startsWith("data: ")) {
-			const data = buffer.slice(6).trim();
-			if (data && data !== "[DONE]") {
-				try {
-					const parsed = JSON.parse(data);
-					const delta = parsed.choices?.[0]?.delta?.content;
-					if (delta) {
-						fullContent += delta;
-						yield { type: "chunk", content: delta };
-					}
-				} catch (e) {
-					// 忽略
-				}
-			}
-		}
-
-		// 解析AI归纳的任务名
-		let aiTaskName = "";
-		const taskNameMatch = fullContent.match(/(?:--)?任务名[：:]\s*(.+)/);
-		if (taskNameMatch) {
-			aiTaskName = taskNameMatch[1].trim().replace(/["'""「」『』]/g, "").substring(0, 20);
-		}
-		const finalTaskName = aiTaskName || requirement.replace(/\s+/g, "").substring(0, 20);
-
-		const sql = fullContent
-			.replace(/```sql\s*/gi, "")
-			.replace(/```\s*/g, "")
-			.trim();
-
-		yield { type: "done", sql, taskName: finalTaskName };
-	}
-
-	async *generateStream(requirement, attachmentText, model) {
-		this.ctx.service.skillConfig.savePrompt(requirement);
-		yield* this._callApiStream(requirement, attachmentText, model);
+		const data = await resp.json();
+		this.app.logger.info('[AI] API原始返回:', JSON.stringify(data).substring(0, 500));
+		const msg = data.choices?.[0]?.message
+			|| data.output?.choices?.[0]?.message
+			|| {};
+		const reasoningText = msg.reasoning_content || "";
+		const bodyText = msg.content || data.output?.text || data.choices?.[0]?.text || "";
+		const content = reasoningText + bodyText;
+		this.app.logger.info('[AI] reasoning_content长度:', reasoningText.length, '| content长度:', bodyText.length, '| 合并后长度:', content.length);
+		return content;
 	}
 
 	async generate(requirement, attachmentText, model) {
 		this.ctx.service.skillConfig.savePrompt(requirement);
-		let sql = "";
-		let taskName = "";
-		for await (const event of this._callApiStream(requirement, attachmentText, model)) {
-			if (event.type === "done") {
-				sql = event.sql;
-				taskName = event.taskName;
-			}
-		}
-		return { sql, taskName };
-	}
-
-	async _generateOld(requirement, attachmentText, model) {
-		this.ctx.service.skillConfig.savePrompt(requirement);
 		const content = await this._callApi(requirement, attachmentText, model);
 
-		// 解析AI归纳的任务名（--任务名：xxx 或 任务名：xxx）
 		let aiTaskName = "";
 		const taskNameMatch = content.match(/(?:--)?任务名[：:]\s*(.+)/);
 		if (taskNameMatch) {
@@ -307,11 +360,19 @@ ${examples}
 		}
 		const finalTaskName = aiTaskName || requirement.replace(/\s+/g, "").substring(0, 20);
 
-		const sql = content
+		// 提取 ```sql 代码块中的内容，丢弃模型输出的思考过程
+	let sql;
+	const sqlBlockMatch = content.match(/```sql\s*([\s\S]*?)```/i);
+	if (sqlBlockMatch) {
+		sql = sqlBlockMatch[1].trim();
+	} else {
+		sql = content
+			.replace(/<think>[\s\S]*?<\/think>/gi, "")
 			.replace(/```sql\s*/gi, "")
 			.replace(/```\s*/g, "")
 			.trim();
-		return { sql, taskName: finalTaskName };
+	}
+	return { sql, taskName: finalTaskName };
 	}
 
 	async mergeDailyReports(templateHeaders, templateRows, dailyFiles) {

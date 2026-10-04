@@ -254,18 +254,10 @@ class BigDataController extends Controller {
 		}
 
 		try {
-		ctx.response.set("Content-Type", "text/event-stream");
-		ctx.response.set("Cache-Control", "no-cache");
-		ctx.response.set("Connection", "keep-alive");
-
-		const stream = service.aiSql.generateStream(query, attachmentText, model);
-		for await (const event of stream) {
-			ctx.response.write(`data: ${JSON.stringify(event)}\n\n`);
-		}
+		const result = await service.aiSql.generate(query, attachmentText, model);
+		ctx.sendSuccess(result);
 	} catch (e) {
-		ctx.response.write(`data: ${JSON.stringify({ type: "error", message: e.message || "AI服务异常" })}\n\n`);
-	} finally {
-		ctx.response.end();
+		ctx.sendError(e.message || "AI服务异常");
 	}
 }
 
