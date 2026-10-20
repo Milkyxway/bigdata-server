@@ -47,6 +47,16 @@ class RoleController extends Controller {
 		}
 	}
 
+	async getUserById() {
+		const { ctx, service } = this;
+		try {
+			const result = await service.role.getUserById(ctx.request.body);
+			return ctx.sendSuccess(result);
+		} catch (e) {
+			return ctx.sendError(e);
+		}
+	}
+
 	async deleteUser() {
 		const { ctx, service } = this;
 		try {

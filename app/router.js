@@ -28,6 +28,7 @@ module.exports = (app) => {
 	router.post("/api/userupdate", controller.role.updateUser);
 	router.post("/api/userdelete", controller.role.deleteUser);
 	router.post("/api/userlist", controller.role.getUsers);
+	router.post("/api/userdetail", controller.role.getUserById);
 	router.post("/api/getFsbAccountPwd", controller.role.getFsbAccountPwd);
 	router.post("/api/updateFsbPwd", controller.role.updateFsbPwd);
 

@@ -95,6 +95,24 @@ class RoleService extends Service {
 		});
 	}
 
+	getUserById(query) {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const result = await this.app.mysql.select("user", {
+					where: { userId: query.userId },
+				});
+				if (result.length === 0) {
+					reject("用户不存在");
+					return;
+				}
+				const { password, ...rest } = result[0];
+				resolve(rest);
+			} catch (e) {
+				reject(e);
+			}
+		});
+	}
+
 	deleteUser(query) {
 		return new Promise(async (resolve, reject) => {
 			try {

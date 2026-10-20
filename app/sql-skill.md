@@ -19,6 +19,8 @@ description: 专业的 Oracle SQL 提数助手。根据用户需求编写高效�
 ### SQL 书写铁律
 - **严禁 `SELECT *`**，必须显式列出字段。
 - **分页限制**：首次查询带 `ROWNUM <= 100` 或 `FETCH FIRST 100 ROWS ONLY`。
+- **表名日期占位符替换**：`yyyymmdd` 替换为 t-1 日期格式如 `20260921`（`TRUNC(SYSDATE)-1`），`yyyymm` 替换为年月如 `202609`。禁止保留占位符原样。
+- **IN 条件不得省略**：用户需求中提供的值（如用户ID、终端号、产品ID等）必须完整写入 SQL 的 IN 条件中，不得用 `...` 或任何方式缩略。附件中的值也同理。
 - **时间过滤**：命中索引字段（`CREATE_TIME`, `UPDATE_TIME`, `VALID_DATE`, `EXPIRE_DATE`, `OPEN_DATE`），格式：
   - 今日：`COLUMN >= TRUNC(SYSDATE)`
   - 昨日：`COLUMN >= TRUNC(SYSDATE)-1 AND COLUMN < TRUNC(SYSDATE)`
@@ -121,7 +123,6 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | asset_item_id | VARCHAR2(20) | 账本科目（注意：此字段与其他表的 asset_item_id 含义不同）             |
 | service_id    | VARCHAR2(20) | 业务ID 1002=电视 1003=互动 1004=宽带 1005=付费节目 1006=互动点播 1008=增值业务 |
 
-```
 ### files2.cm_account（账户表）acct_id 关联余额表、欠费表等与钱相关的表
 | 字段名      | 类型         | 说明                                   |
 | :---------- | :----------- | :------------------------------------- |
@@ -200,8 +201,9 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | SUBSCRIBER_INS_ID | NUMBER(16) | 终端实例标识（主键） |
 | CUST_ID | NUMBER(16) | 客户标识 |
 | BILL_ID | VARCHAR2(120) | 机顶盒号 |
+| SUB_BILL_ID | VARCHAR2(120) | 卡号 |
 | LOGIN_NAME | VARCHAR2(64) | 宽带账号名 |
-| SUBSCRIBER_TYPE | VARCHAR2(6) | 用户类型 |
+| SUBSCRIBER_TYPE | VARCHAR2(6) | 用户类型：1=电视, 3=宽带 |
 | STATE | VARCHAR2(3) | 用户状态：1=正常,M=停机,C=预销,D=注销 |
 | CORP_ORG_ID | NUMBER(12) | 分公司ID |
 | VALID_DATE | DATE | 生效日期 |
@@ -260,24 +262,24 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | DT | VARCHAR2(16) | 日期分区 yyyymmdd，取 t-4 |
 
 ### rep.rep_fact_lan_cust_new_yyyymmdd（有价宽带表，日分区，最小颗粒到终端 subscriber_ins_id）
+> 该表已包含终端+宽带+分公司信息，查询有价宽带时仅用此表即可，无需关联其他表
 | 字段名 | 类型 | 说明 |
 | :--- | :--- | :--- |
-| CORP_ORG_ID | NUMBER(30) | 公司ID |
+| CORP_ORG_ID | NUMBER(30) | 公司ID，3328=江阴，3330=宜兴 |
 | CUST_CODE | VARCHAR2(255) | 客户证号 |
 | CUST_ID | NUMBER(30) | 客户ID |
 | SUBSCRIBER_INS_ID | NUMBER(30) | 终端实例ID |
 | OFFER_ID | NUMBER(16) | 套餐ID |
-| OFFER_NAME | VARCHAR2(128) | 套餐名称 |
-| BANDWIDTH | NUMBER(30) | 带宽 |
+| OFFER_NAME | VARCHAR2(128) | 套餐名称（仅用于展示，禁止从中解析带宽） |
+| BANDWIDTH | NUMBER(30) | 带宽（如100=100M，1000=1000M） |
+| IS_PRICE_LAN_PAIED_2026 | NUMBER(1) | 有价宽带缴费标识 1=已缴费, 0=未缴费（2026年） |
 | PRICE_END | NUMBER(30) | 价格 |
 | OFFER_VALID_DATE | DATE | 套餐生效日期 |
 | OFFER_EXPIRE_DATE | DATE | 套餐失效日期 |
 | OFFER_CREATE_DATE | DATE | 套餐创建日期 |
 | OFFER_DONE_DATE | DATE | 套餐完成日期 |
-| IS_LAN_PRICED_PAIED_241231 | NUMBER(30) | 截至241231有价宽带缴费标识 |
-| IS_LAN_PRICED_PAIED_251231 | NUMBER(30) | 截至251231有价宽带缴费标识 |
-| IS_PRICE_LAN_PAIED_2026 | NUMBER(30) | 有价宽带缴费标识（2026年） |
-| IS_PRICE_LAN_PAIED | NUMBER(30) | 有价宽带缴费标识 |
+| IS_LAN_PRICED_PAIED_241231 | NUMBER(1) | 截至241231有价宽带缴费标识 |
+| IS_LAN_PRICED_PAIED_251231 | NUMBER(1) | 截至251231有价宽带缴费标识 |
 
 ### jour2.om_order_yyyymm（订单表，月分区）
 | 字段名 | 类型 | 说明 |
@@ -291,7 +293,6 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | DONE_DATE | DATE | 完成时间 |
 | DEV_ID | VARCHAR2(100) | 发展人ID |
 | own_corp_org_id | VARCHAR2(512) | 公司ID |
-|
 
 ### rep2.rep_fact_cust_info_yyyymmdd（客户信息表，日分区）
 | 字段名 | 类型 | 说明 |
@@ -300,7 +301,7 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | CUST_CODE | VARCHAR2(50) | 客户编码/手机号 |
 | PARTY_NAME | VARCHAR2(200) | 客户名称 |
 | STAND_NAME | VARCHAR2(200) | 客户地址 |
-| CORP_ORG_ID | NUMBER(10) | 公司ID，3303=无锡 |
+| CORP_ORG_ID | NUMBER(10) | 公司ID，3303=无锡, 3328=江阴, 3330=宜兴 |
 | district_name | VARCHAR2(100) | 广电站名称 |
 | CUST_TYPE | NUMBER(2) | 客户类型 |
 | STATUS | VARCHAR2(10) | 客户状态 |
@@ -310,5 +311,5 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | 字段名 | 类型 | 说明 |
 | :--- | :--- | :--- |
 | ACCT_ID | NUMBER(30) | 账户ID |
-| ASSET_ITEM_ID | NUMBER(30) | 账本ID '100'='通用现金账本， '200'='数字基本现金账本','300'='互动基本现金账本','600'='虚拟通用账本' |
+| ASSET_ITEM_ID | NUMBER(30) | 账本ID，100=通用现金账本, 200=数字基本现金账本, 300=互动基本现金账本, 600=虚拟通用账本 |
 | BALANCE | NUMBER(30) | 余额 |

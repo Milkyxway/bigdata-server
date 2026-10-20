@@ -189,6 +189,15 @@ UNION
 SELECT DISTINCT be2.cust_code, be2.subscriber_ins_id AS 序列号, be2.online_duration AS 时长, 'UPDATE' AS 来源
 FROM rep.DWA_KD_BEHAVIOR_UPDATE_yyyymmdd be2
 
+# 有价宽带缴费终端查询（重要！禁止臆想字段）
+查询有价宽带缴费终端必须使用 rep.rep_fact_lan_cust_new_yyyymmdd 表，该表已包含所有需要的字段，无需关联其他表。
+| 关键字段 | 用途 |
+| BANDWIDTH | 带宽数值（不是 lan_speed，不是从 OFFER_NAME 解析） |
+| IS_PRICE_LAN_PAIED_2026 | 有价宽带缴费标识 1=已缴费, 0=未缴费（不是 is_lan_paied） |
+| CORP_ORG_ID | 分公司ID，该表自带，无需从其他表获取 |
+| SUBSCRIBER_INS_ID | 终端实例ID |
+| OFFER_NAME | 套餐名称（仅用于展示，不可用于判断带宽） |
+
 # 移网/5G表统计口径（重要！）
 表名：repcx.rep_fact_yw_um_subscriber_info_yyyymmdd（日分区，取 T-1 日期）
 所有统计指标均对 user_id 去重：
