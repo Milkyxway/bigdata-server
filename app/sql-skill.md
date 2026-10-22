@@ -21,6 +21,7 @@ description: 专业的 Oracle SQL 提数助手。根据用户需求编写高效�
 - **分页限制**：首次查询带 `ROWNUM <= 100` 或 `FETCH FIRST 100 ROWS ONLY`。
 - **表名日期占位符替换**：`yyyymmdd` 替换为 t-1 日期格式如 `20260921`（`TRUNC(SYSDATE)-1`），`yyyymm` 替换为年月如 `202609`。禁止保留占位符原样。
 - **IN 条件不得省略**：用户需求中提供的值（如用户ID、终端号、产品ID等）必须完整写入 SQL 的 IN 条件中，不得用 `...` 或任何方式缩略。附件中的值也同理。
+- **UNION ALL 分区表不得省略**：跨月/跨日查询需要 UNION ALL 多张分区表时，必须逐张写出所有表名，禁止用 `...` 省略中间表。例如 202601 到 202608 必须写出全部 8 张表。
 - **时间过滤**：命中索引字段（`CREATE_TIME`, `UPDATE_TIME`, `VALID_DATE`, `EXPIRE_DATE`, `OPEN_DATE`），格式：
   - 今日：`COLUMN >= TRUNC(SYSDATE)`
   - 昨日：`COLUMN >= TRUNC(SYSDATE)-1 AND COLUMN < TRUNC(SYSDATE)`
