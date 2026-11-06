@@ -1,9 +1,9 @@
 // 测试各模型耗时对比：代理 vs 直连
 const tests = [
   { name: "直连 deepseek-chat", url: "https://api.deepseek.com/v1/chat/completions", key: "sk-a2a142c936c74cd6ab7899268ca1269c", model: "deepseek-chat" },
-  { name: "代理 glm-5.3", url: "http://modelrouter.js96296.com/v1/chat/completions", key: "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG", model: "glm-5.3" },
-  { name: "代理 qwen-plus", url: "http://modelrouter.js96296.com/v1/chat/completions", key: "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG", model: "qwen-plus" },
-  { name: "代理 deepseek-v4-pro", url: "http://modelrouter.js96296.com/v1/chat/completions", key: "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG", model: "deepseek-v4-pro" },
+  { name: "代理 glm-5.3", url: "https://modelrouter.js96296.com/v1/chat/completions", key: "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG", model: "glm-5.3" },
+  { name: "代理 qwen-plus", url: "https://modelrouter.js96296.com/v1/chat/completions", key: "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG", model: "qwen-plus" },
+  { name: "代理 deepseek-v4-pro", url: "https://modelrouter.js96296.com/v1/chat/completions", key: "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG", model: "deepseek-v4-pro" },
 ];
 
 const AjSql = require("./app/service/aiSql.js");

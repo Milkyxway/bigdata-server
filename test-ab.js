@@ -243,7 +243,7 @@ async function callApi(label, baseURL, apiKey, model, requirement, useAllTables)
 // ===== 主入口 =====
 (async () => {
 	const requirement = "查询20260831无锡现金账本余额<50，及50-100之间的去重用户数 按照广电站聚合";
-	const baseURL = "http://modelrouter.js96296.com/v1";
+	const baseURL = "https://modelrouter.js96296.com/v1";
 	const apiKey = "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG";
 	const model = "glm-5.3";
 

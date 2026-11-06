@@ -246,7 +246,7 @@ async function callApi(label, baseURL, apiKey, model, requirement) {
 	// 测试：代理 glm-5.3
 	await callApi(
 		"代理-glm-5.3",
-		"http://modelrouter.js96296.com/v1",
+		"https://modelrouter.js96296.com/v1",
 		"sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG",
 		"glm-5.3",
 		requirement

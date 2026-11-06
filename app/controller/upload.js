@@ -47,23 +47,25 @@ class UploadController extends Controller {
 		}
 	}
 
-	renameFile(data) {
+	async renameFile() {
 		const { ctx } = this;
 		try {
 			const { request } = ctx;
-			let params
+			let params;
 			if (request.body.path === 'out') {
-				params  =  {
-					reportLink: request.body.taskName
-				}
-			} else if(request.body.path === 'upload') {
 				params = {
-					SourceExcelLink:  reques
-				}
+					reportLink: request.body.taskName
+				};
+			} else if (request.body.path === 'upload') {
+				params = {
+					SourceExcelLink: request.body.SourceExcelLink
+				};
 			}
-			fs.renameSync(`${path.resolve()}/app/public/${request.body.path}/${request.body.fileName }`,`${path.resolve()}/app/public/${request.body.path}/${request.body.taskName}.xlsx`)
-
-			this.app.mysql.update('report_list', { report})
+			fs.renameSync(
+				`${path.resolve()}/app/public/${request.body.path}/${request.body.fileName}`,
+				`${path.resolve()}/app/public/${request.body.path}/${request.body.taskName}.xlsx`
+			);
+			await this.app.mysql.update('report_list', params, { where: { id: request.body.id } });
 			return ctx.sendSuccess();
 		} catch (e) {
 			return ctx.sendError(e);

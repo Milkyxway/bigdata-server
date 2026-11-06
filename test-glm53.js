@@ -11,7 +11,7 @@ svc.app = {
 svc.config = {
   deepseek: {
     apiKey: "sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG",
-    baseURL: "http://modelrouter.js96296.com/v1",
+    baseURL: "https://modelrouter.js96296.com/v1",
     model: "glm-5.3",
     timeout: 300000,
   },
@@ -22,7 +22,7 @@ const req = "查询20260831无锡现金账本余额<50，及50-100之间的去�
 svc._buildSystemPrompt(req).then((sys) => {
   console.log("系统prompt长度:", sys.length);
   const start = Date.now();
-  fetch("http://modelrouter.js96296.com/v1/chat/completions", {
+  fetch("https://modelrouter.js96296.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -100,7 +100,7 @@ config.pushSftp = {
 config.deepseek = {
     apiKey: 'sk-H8UF0IsSBUERzOMCoVJfO9TA7WNDoOQ19nupd5qlv5m0SuzG',
     model: 'deepseek-chat',
-    baseURL: 'http://modelrouter.js96296.com/v1',
+    baseURL: 'https://modelrouter.js96296.com/v1',
     timeout: 300000,
 };
 
