@@ -157,13 +157,16 @@ const STATIC_RULES = `
 - 所有金额字段以分为单位，必须 /100 并保留两位小数：ROUND(NVL(AMOUNT, 0)/100, 2) AS "金额"
 
 # 分区表处理（关键！）
-1. 日分区表（以 yyyymmdd 结尾）：大多数表取 T-1 日期，即 TRUNC(SYSDATE)-1
-   - 表名计算方式：TO_CHAR(TRUNC(SYSDATE)-1, 'YYYYMMDD')
-   - 特例：DWA_KD_BEHAVIOR_UPDATE、DWA_CRM_KD_BEHAVIOR（宽带使用记录表）取 T-4，即 TRUNC(SYSDATE)-4
-   - 如果今天是 2026-08-21，则 T-1 为 20260820，T-4 为 20260817
-   - 严禁硬编码日期，必须根据当前日期和表规则动态计算
-2. 月分区表（以 yyyymm 结尾）：必须拼接 2026 年以来所有月份 UNION ALL
-   - 例如：rep2.rep_fact_payoff_consume_detail_202601 UNION ALL ... UNION ALL rep2.rep_fact_payoff_consume_detail_202608
+  书写SQL时必须使用实际日期数字，禁止输出yyyymmdd/yyyymm字面量！
+1. 日分区表（以 yyyymmdd 结尾）：
+   - 如果用户需求中提到了具体日期（如"11月5日"），则使用该日期，例如 20261105
+   - 如果用户未指定日期，上午(12点前)取T-2，下午取T-1
+   - 表名直接写8位数字日期，严禁保留yyyymmdd字面量
+   - 特例：DWA_KD_BEHAVIOR_UPDATE、DWA_CRM_KD_BEHAVIOR（宽带使用记录表）始终取 T-4
+2. 月分区表（以 yyyymm 结尾）：根据用户需求中描述的时间范围，拼接对应月份的 UNION ALL 表名。
+   - 例如用户说"202601-202610销账" → 写 202601 到 202610 共10张表，每张都要写出
+   - 用户说"2026年销账" → 202601 到当前月的所有表
+   - 严禁用 ... 省略中间表，每张表名必须完整写出
 
 # 包年宽带周报表名映射（重要！）
 当用户提到以下日报名称时，使用对应的固化表名，$4 替换为 T-1 的 yyyymmdd：
@@ -257,6 +260,66 @@ SQL 中关键字大写（SELECT, FROM, WHERE, JOIN），表名/字段名保持�
 SQL 第一行必须写注释 -- 由AI生成，请人工审核
 用 \`\`\`sql 代码块包裹。`;
 
+// 计算日分区表日期：上午(12点前)取T-2，下午取T-1
+function computeDayPartitionDate() {
+	const now = new Date();
+	const isAM = now.getHours() < 12;
+	const offset = isAM ? -2 : -1;
+	const d = new Date(now);
+	d.setDate(d.getDate() + offset);
+	const yyyy = d.getFullYear();
+	const mm = String(d.getMonth() + 1).padStart(2, '0');
+	const dd = String(d.getDate()).padStart(2, '0');
+	return { date: `${yyyy}${mm}${dd}`, t: isAM ? 'T-2' : 'T-1', isAM };
+}
+
+// 计算T-4日期（宽带行为记录专用）
+function computeT4Date() {
+	const d = new Date();
+	d.setDate(d.getDate() - 4);
+	const yyyy = d.getFullYear();
+	const mm = String(d.getMonth() + 1).padStart(2, '0');
+	const dd = String(d.getDate()).padStart(2, '0');
+	return `${yyyy}${mm}${dd}`;
+}
+
+// 检查用户需求中是否指定了具体日期
+function hasDateReference(requirement) {
+	if (!requirement) return false;
+	const datePatterns = [
+		/\d{1,2}月\d{1,2}[日号]/,       // 11月5日、11月5号
+		/\d{4}年\d{1,2}月/,              // 2026年11月
+		/\d{4}-\d{1,2}-\d{1,2}/,         // 2026-11-05
+		/\d{8}/,                          // 20261105
+		/今天|昨天|前天|本周|上周|本月|上月|今年|去年/,
+	];
+	return datePatterns.some(p => p.test(requirement));
+}
+
+// 替换SQL中的日期占位符
+function replaceDatePlaceholders(sql, requirement) {
+	const dayInfo = computeDayPartitionDate();
+	const t4Date = computeT4Date();
+
+	let fixed = sql;
+
+	// DWA_KD_BEHAVIOR 系列表取 T-4
+	const kdBehaviorRegex = /(DWA_KD_BEHAVIOR_UPDATE|DWA_CRM_KD_BEHAVIOR)_yyyymmdd/gi;
+	fixed = fixed.replace(kdBehaviorRegex, `$1_${t4Date}`);
+
+	// 其余 yyyymmdd 日分区表
+	if (hasDateReference(requirement)) {
+		// 用户指定了日期，不自动替换，由LLM根据需求决定
+	} else {
+		// 未指定日期，上午T-2 下午T-1
+		fixed = fixed.replace(/_yyyymmdd/gi, `_${dayInfo.date}`);
+		fixed = fixed.replace(/yyyymmdd/gi, dayInfo.date);
+	}
+
+	// yyyymm 月分区表：不自动替换，由LLM根据用户需求中的时间范围UNION ALL
+	return fixed;
+}
+
 class AiSqlService extends Service {
 	async _buildSystemPrompt(requirement) {
 		const parsed = parseSchema(this.app.baseDir);
@@ -285,6 +348,10 @@ class AiSqlService extends Service {
 			});
 		}
 
+		const dayInfo = computeDayPartitionDate();
+		const dayHint = dayInfo.isAM
+			? `现在是上午，日分区表请使用 T-2 日期：${dayInfo.date}`
+			: `现在是下午，日分区表请使用 T-1 日期：${dayInfo.date}`;
 		return `你是一名拥有 10 年经验的 Oracle 数据库开发专家，擅长 OLTP 系统的 Ad-hoc 查询（提数）和报表统计。
 根据用户需求编写高效、准确的 Oracle SQL（支持 11g/12c/19c），适用于 PL/SQL Developer 直接执行。
 
@@ -300,7 +367,7 @@ ${STATIC_RULES}
 ${businessRules}
 ${examples}
 
-注意：当前日期是 ${new Date().toISOString().slice(0, 10)}，请基于此日期计算 T-1 分区表名。
+当前日期：${new Date().toISOString().slice(0, 10)}，${dayHint}。SQL中表名严禁出现yyyymmdd/yyyymm字面量，必须替换为实际日期数字！
 
 现在请根据以下用户需求生成SQL：`;
 	}
@@ -314,10 +381,12 @@ ${examples}
 
 		// 直连快速模式：走 DeepSeek 官方 API
 		const isDirect = model === "deepseek-chat-direct";
-		this.ctx.logger.info('[AI] model参数:', model, '| isDirect:', isDirect, '| useBaseURL:', isDirect ? "https://api.deepseek.com/v1" : baseURL, '| useModel:', isDirect ? "deepseek-chat" : (model || this.config.deepseek.model));
-		const useApiKey = isDirect ? "sk-a2a142c936c74cd6ab7899268ca1269c" : apiKey;
-		const useBaseURL = isDirect ? "https://api.deepseek.com/v1" : baseURL;
-		const useModel = isDirect ? "deepseek-chat" : (model || this.config.deepseek.model);
+		// GLM5.3 公网模式：走智谱官方 API
+		const isGLMPublic = model === "glm-5.3-public";
+		this.ctx.logger.info('[AI] model参数:', model, '| isDirect:', isDirect, '| isGLMPublic:', isGLMPublic, '| useBaseURL:', isDirect ? "https://api.deepseek.com/v1" : isGLMPublic ? "https://open.bigmodel.cn/api/paas/v4" : baseURL, '| useModel:', isDirect ? "deepseek-chat" : isGLMPublic ? "glm-4-flash" : (model || this.config.deepseek.model));
+		const useApiKey = isDirect ? "sk-a2a142c936c74cd6ab7899268ca1269c" : isGLMPublic ? "9c79f6dda1f94b499b1134d73bb71e66.Jv5OjSNiLSU5bbef" : apiKey;
+		const useBaseURL = isDirect ? "https://api.deepseek.com/v1" : isGLMPublic ? "https://open.bigmodel.cn/api/paas/v4" : baseURL;
+		const useModel = isDirect ? "deepseek-chat" : isGLMPublic ? "glm-4-flash" : (model || this.config.deepseek.model);
 		const url = `${useBaseURL}/chat/completions`;
 
 		const resp = await fetch(url, {
@@ -381,7 +450,9 @@ ${examples}
 			.replace(/```\s*/g, "")
 			.trim();
 	}
-	return { sql, taskName: finalTaskName };
+	// 替换日期占位符：日表上午T-2下午T-1，宽带表T-4，月表当月
+		sql = replaceDatePlaceholders(sql, requirement);
+		return { sql, taskName: finalTaskName };
 	}
 
 	async mergeDailyReports(templateHeaders, templateRows, dailyFiles) {

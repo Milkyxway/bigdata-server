@@ -95,40 +95,25 @@ class BigDataService extends Service {
 	}
 
 	handleQueryToSqlStr(rest, reportName, username, orgId, LargeCategory) {
-		let notEmptyParams = {};
-		let whereStr = "";
-		Object.keys(rest).map((i) => {
-			if (rest[i] !== "") {
-				notEmptyParams[i] = rest[i];
+		const conditions = [];
+		Object.keys(rest).forEach((i) => {
+			if (rest[i] !== "" && rest[i] !== null && rest[i] !== undefined) {
+				conditions.push(`${i} = '${rest[i]}'`);
 			}
 		});
-		Object.keys(notEmptyParams).map((i, index) => {
-			if (index !== 0) {
-				whereStr = whereStr + ` && ${i} = '${notEmptyParams[i]}'`;
-			} else {
-				whereStr = `WHERE ${i} = '${notEmptyParams[i]}'`;
-			}
-		});
-		const commonSql = (key, val) => {
-			return this.isEmptyObj(notEmptyParams)
-				? `where ${key} like '%${val}%'`
-				: `${whereStr} and ${key} like '%${val}%'`;
-		};
-
 		if (reportName) {
-			whereStr = commonSql("reportName", reportName);
+			conditions.push(`reportName like '%${reportName}%'`);
 		}
 		if (username) {
-			whereStr = commonSql('username', username);
+			conditions.push(`username like '%${username}%'`);
 		}
 		if (LargeCategory) {
-			whereStr = commonSql('LargeCategory', LargeCategory);
+			conditions.push(`LargeCategory like '%${LargeCategory}%'`);
 		}
 		if (orgId) {
-			whereStr = this.isEmptyObj(notEmptyParams) ? `where taskAssignOrg = ${orgId}`:`${whereStr} and taskAssignOrg = ${orgId}`
+			conditions.push(`taskAssignOrg = ${orgId}`);
 		}
-		
-		return whereStr;
+		return conditions.length ? `where ${conditions.join(' and ')}` : "";
 	}
 
 	getExcelList(reportId) {

@@ -19,7 +19,7 @@ description: 专业的 Oracle SQL 提数助手。根据用户需求编写高效�
 ### SQL 书写铁律
 - **严禁 `SELECT *`**，必须显式列出字段。
 - **分页限制**：首次查询带 `ROWNUM <= 100` 或 `FETCH FIRST 100 ROWS ONLY`。
-- **表名日期占位符替换**：`yyyymmdd` 替换为 t-1 日期格式如 `20260921`（`TRUNC(SYSDATE)-1`），`yyyymm` 替换为年月如 `202609`。禁止保留占位符原样。
+- **表名日期占位符替换**：日分区表 `yyyymmdd` 上午(12点前)替换为 T-2 日期、下午替换为 T-1 日期，禁止保留占位符原样。月分区表 `yyyymm` 根据用户需求中的时间范围拼 UNION ALL，不得保留占位符。
 - **IN 条件不得省略**：用户需求中提供的值（如用户ID、终端号、产品ID等）必须完整写入 SQL 的 IN 条件中，不得用 `...` 或任何方式缩略。附件中的值也同理。
 - **UNION ALL 分区表不得省略**：跨月/跨日查询需要 UNION ALL 多张分区表时，必须逐张写出所有表名，禁止用 `...` 省略中间表。例如 202601 到 202608 必须写出全部 8 张表。
 - **时间过滤**：命中索引字段（`CREATE_TIME`, `UPDATE_TIME`, `VALID_DATE`, `EXPIRE_DATE`, `OPEN_DATE`），格式：
@@ -332,7 +332,7 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | district_name | VARCHAR2(100) | 广电站名称 |
 | CUST_TYPE | NUMBER(2) | 客户类型 |
 | STATUS | VARCHAR2(10) | 客户状态 |
-| CREATE_TIME | DATE | 创建时间 |
+| create_date | DATE | 开户时间（创建时间），查询客户开户时间用此字段 |
 
 ### rep2.rep_fact_balance_yyyymmdd（客户余额表，日分区）
 | 字段名 | 类型 | 说明 |
