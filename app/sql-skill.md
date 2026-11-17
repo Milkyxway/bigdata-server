@@ -121,8 +121,12 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | total_amount  | VARCHAR2(2)  | 金额（分）                                                            |
 | mon           | VARCHAR2(20) | 账期                                                                  |
 | corp_org_id   | VARCHAR2(20) | 市ID 3303=无锡, 3328=江阴, 3330=宜兴                                  |
-| asset_item_id | VARCHAR2(20) | 账本科目（注意：此字段与其他表的 asset_item_id 含义不同）             |
+| asset_item_id | VARCHAR2(20) | 账本科目（注意：本表的 asset_item_id 是账本科目，其它表的 asset_item_id 是账本ID，含义不同） |
+| acct_item_id  | VARCHAR2(20) | 账本类型ID                                                          |
+| acct_item_name | VARCHAR2(20) | 账本类型名称                                                        |
 | service_id    | VARCHAR2(20) | 业务ID 1002=电视 1003=互动 1004=宽带 1005=付费节目 1006=互动点播 1008=增值业务 |
+
+> 规则：需求中提到「销账」「现金账本」时，写死过滤条件 `acct_item_name like '%现金%'`。
 
 ### files2.cm_account（账户表）acct_id 关联余额表、欠费表等与钱相关的表
 | 字段名      | 类型         | 说明                                   |
