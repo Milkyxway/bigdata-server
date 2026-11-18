@@ -44,6 +44,27 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
   AND ROWNUM <= 100;
 ```
 
+**需求**：查询玉祁仓库、状态为5/6的光猫设备明细（SKU、序列号、入库日期）。
+
+**输出**：
+```sql
+SELECT DISTINCT a.res_sku_id,
+                bsd.code_name,
+                a.serial_no,
+                b.store_name,
+                c.res_sku_name,
+                a.in_date
+FROM res1.res_terminal a
+LEFT JOIN params1.bs_static_data bsd
+       ON bsd.code_value = a.state
+      AND bsd.code_type = 'RES_TERMINAL@STATE'
+INNER JOIN res1.res_store b ON a.store_id = b.store_id
+INNER JOIN res1.res_sku c ON a.res_sku_id = c.res_sku_id
+WHERE c.res_sku_id IN ('1153930','1153929','1153909','1151326','552044690','11538006','11538003')
+  AND b.store_name LIKE '%玉祁%'
+  AND a.state IN (5, 6)
+```
+
 ## 表关联关系
 
 | 主表                             | 关联字段          | 从表                               | 关联字段          | 关系 | 说明               |
@@ -192,13 +213,15 @@ WHERE CREATE_TIME >= TRUNC(SYSDATE)
 | :--- | :--- | :--- |
 | SUBSCRIBER_INS_ID | NUMBER(16) | 终端序列号，关联终端表 |
 | CUST_ID | NUMBER(16) | 客户ID |
-| RES_TYPE_ID | VARCHAR2(50) | 资源类型ID |
+| RES_TYPE_ID | VARCHAR2(50) | 资源类型ID（2=机顶盒, 3=智能卡） |
 | RES_TYPE_NAME | VARCHAR2(255) | 资源类型名称 |
 | RES_EQU_NO | VARCHAR2(64) | 设备编号 |
 | RES_SKU_ID | VARCHAR2(64) | SKU ID |
 | RES_SKU_NAME | VARCHAR2(128) | SKU名称 |
 | CREATE_DATE | DATE | 创建日期 |
 | CORP_ORG_ID | NUMBER(12) | 归属分公司 |
+
+> 规则：查询此表时，需求中指定「机顶盒」加 `res_type_id = '2'`，指定「智能卡」加 `res_type_id = '3'`。
 
 ### files2.um_subscriber（终端用户信息表）
 | 字段名 | 类型 | 说明 |
